@@ -51,6 +51,14 @@ a#linkSettings:hover {
   float: left;
   margin-right: 20px;
 }
+#rate {
+  float: left;
+  width: 100%;
+  margin-top: 20px;
+  font-size: 18px;
+  font-style: italic;
+  display: none;
+}
 </style>
 </head>
 <body>
@@ -85,12 +93,39 @@ a#linkSettings:hover {
 if (title) document.getElementById('title').innerHTML = document.getElementsByTagName("title")[0].innerHTML = title;
 if (window.innerWidth > 500) document.getElementById('content').style.fontSize = '28px';
 
+function showNextButtons() {
+  document.getElementById('tips').style.display = 'block';
+  document.getElementById('next').style.display = 'block';
+  document.getElementById('c').style.zIndex = -1;
+  
+  if (localStorage) {
+    var rateMarks = localStorage.getItem("rate_marks");
+	if (rateMarks) {
+	  var correctCount = 0;
+	  for (var i = 0; i < rateMarks.length; ++i) { if (rateMarks[i] == "1") ++correctCount; }
+	  var rateValue = Math.floor(correctCount * 100 / rateMarks.length);
+	  document.getElementById('rate').innerHTML = '最近' + rateMarks.length + '题正确率: ' + rateValue + '%';
+      document.getElementById('rate').style.display = 'block';
+	}
+  }
+}
+
 function showResult(userAnswer) {
   clearInterval(window.myTimer);
   if (!window.firstSelect) {
     window.firstSelect = userAnswer;
 	if (localStorage) {
 	  localStorage.setItem("wrong_" + window.currentId, userAnswer == window.answer ? "1" : null);
+	  
+	  // calc rate marks
+	  var rateMarks = localStorage.getItem("rate_marks");
+	  var mark = userAnswer == window.answer ? "1" : "0";
+	  if (!rateMarks) rateMarks = mark;
+	  else {
+        while (rateMarks.length >= 25) rateMarks = rateMarks.substring(1);
+		rateMarks += mark;
+	  }
+	  localStorage.setItem("rate_marks", rateMarks);
 	}
   }
   if (userAnswer == window.answer) {
@@ -102,10 +137,9 @@ function showResult(userAnswer) {
       document.getElementById('result').innerHTML = '<span style="color: red">错误，正确答案：' + window.answer + '</span>';
   }
   
-  document.getElementById('tips').style.display = 'block';
-  document.getElementById('next').style.display = 'block';
-  document.getElementById('c').style.zIndex = -1;
+  showNextButtons();
 }
+
 function showElapsed() {
   var result = document.getElementById('result');
   if (result) {
@@ -114,8 +148,7 @@ function showElapsed() {
     else {
       clearInterval(window.myTimer);
       result.innerHTML = '<span style="color: red">' + document.getElementById('timeoutSec').options[document.getElementById('timeoutSec').selectedIndex].value + 's超时，正确答案：' + window.answer + '</span>';
-      document.getElementById('next').style.display = 'block';
-      document.getElementById('tips').style.display = 'block';
+      showNextButtons();
     }
   }
 }
@@ -176,6 +209,7 @@ function showNextQuestion(id) {
     + '<div id="result"></div>'
     + '<div id="tips" style="display:none">解析：<br />' + data[index].t.replace(/\n/g, '<br/><br/>') + '</div>'
     + '<input type="button" id="back" class="pure-button" style="display:none" onclick="window.historyIds.pop();window.r.push(parseInt(window.currentId)-1);showNextQuestion(window.historyIds.pop())" value="返回" /><input type="button" id="next" class="pure-button pure-button-primary" style="display:none" onclick="showNextQuestion()" value="下一题" />'
+	+ '<div id="rate">最近25题正确率: 50%</div>'
   
   document.location = '#' + (index + 1);
   if (window.historyIds.length > 1) document.getElementById('back').style.display = 'block';
