@@ -1,0 +1,341 @@
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>刷题</title>
+<script type="text/javascript" src="data.js"></script>
+<link rel="stylesheet" href="pure-min.css" />
+<link rel="stylesheet" href="modal.min.css" />
+<style>
+body {
+  margin: 10px;
+}
+h1, #content, #next, #back {
+  font-size: 20px;
+}
+.pure-form select {
+  font-size: 12px;
+  height: 30px;
+}
+#A, #B, #C, #D, label {
+  margin-bottom: 10px;
+  cursor: hand;
+}
+#result, #tips, #next, #back {
+  margin-top: 20px;
+}
+#linkSettings, #linkClearCanvas {
+  float: right;
+  text-decoration: none;
+  color: black;
+}
+a#linkSettings:hover {
+  color: #0078e7;
+}
+#linkClearCanvas {
+  margin-right: 10px;
+}
+.modal .copy {
+  padding: 10px;
+  padding-bottom: 15x;
+}
+.modal:target {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 250px;
+  margin-top: -100px;
+  margin-left: -125px;
+}
+#next, #back {
+  float: left;
+  margin-right: 20px;
+}
+#rate {
+  float: left;
+  width: 100%;
+  margin-top: 20px;
+  font-size: 18px;
+  font-style: italic;
+  display: none;
+}
+</style>
+</head>
+<body>
+<form class="pure-form">
+<a id="linkSettings" href="#divSettings" onclick="document.getElementById('close').href=document.getElementById('overlay').href='#'+window.currentId;document.getElementById('overlay').style.visibility=document.getElementById('divSettings').style.visibility='visible'">设置</a><a id="linkClearCanvas" href="javascript:void(clearCanvas())">清除标记</a>
+<h1 id="title">刷题</h1>
+<div id="content">
+</div>
+<div id="divSettings" class="modal" role="dialog" aria-labelledby="设置">
+  <div class="modal-content">
+    <div class="header">
+      <a href="#" id="close" onclick="hideDialog()">
+        <div class="box box3">
+          <svg viewbox="0 0 40 40">
+	        <path class="close-x" d="M 10,10 L 30,30 M 30,10 L 10,30" />
+          </svg>
+        </div>
+      </a>
+      <h2>设置</h2>
+    </div>
+    <div class="copy">
+	  <label for="enableWrongFirst">错题优先: <input id="enableWrongFirst" type="checkbox" checked onclick="setWrongFirstEnabled()" /></label><br />
+	  <label for="enableAudio">开启音效: <input id="enableAudio" type="checkbox" checked onclick="setAudioEnabled()" /></label><br />
+	  倒计时时间: <select id="timeoutSec" onchange="resetTimeout()"><option value="60">60s</option><option value="45">45s</option><option value="30">30s</option><option value="15">15s</option></select>
+    </div>
+  </div>
+  <a id="overlay" href="#" onclick="hideDialog()"><div class="overlay"></div></a>
+</div>
+<canvas id="c" style="position:absolute;top:40;left:0;"></canvas>
+</form>
+<script type="text/javascript">
+if (title) document.getElementById('title').innerHTML = document.getElementsByTagName("title")[0].innerHTML = title;
+if (window.innerWidth > 500) document.getElementById('content').style.fontSize = '28px';
+
+function showNextButtons() {
+  document.getElementById('tips').style.display = 'block';
+  document.getElementById('next').style.display = 'block';
+  document.getElementById('c').style.zIndex = -1;
+  
+  if (localStorage) {
+    var rateMarks = localStorage.getItem("rate_marks");
+	if (rateMarks) {
+	  var correctCount = 0;
+	  for (var i = 0; i < rateMarks.length; ++i) { if (rateMarks[i] == "1") ++correctCount; }
+	  var rateValue = Math.floor(correctCount * 100 / rateMarks.length);
+	  document.getElementById('rate').innerHTML = '最近' + rateMarks.length + '题正确率: ' + rateValue + '%';
+      document.getElementById('rate').style.display = 'block';
+	}
+  }
+}
+
+function showResult(userAnswer) {
+  clearInterval(window.myTimer);
+  if (!window.firstSelect) {
+    window.firstSelect = userAnswer;
+	if (localStorage) {
+	  localStorage.setItem("wrong_" + window.currentId, userAnswer == window.answer ? "1" : null);
+	  
+	  // calc rate marks
+	  var rateMarks = localStorage.getItem("rate_marks");
+	  var mark = userAnswer == window.answer ? "1" : "0";
+	  if (!rateMarks) rateMarks = mark;
+	  else {
+        while (rateMarks.length >= 25) rateMarks = rateMarks.substring(1);
+		rateMarks += mark;
+	  }
+	  localStorage.setItem("rate_marks", rateMarks);
+	}
+  }
+  if (userAnswer == window.answer) {
+    if (document.getElementById('enableAudio').checked) document.getElementById('audio_smart').play();
+    document.getElementById('result').innerHTML = '<span style="color: green">正确</span>';
+  }
+  else {
+    if (document.getElementById('enableAudio').checked) document.getElementById('audio_again').play();
+      document.getElementById('result').innerHTML = '<span style="color: red">错误，正确答案：' + window.answer + '</span>';
+  }
+  
+  showNextButtons();
+}
+
+function showElapsed() {
+  var result = document.getElementById('result');
+  if (result) {
+    if (window.myElasped > 0)
+      result.innerHTML = '剩余：' + window.myElasped + 's';
+    else {
+      clearInterval(window.myTimer);
+      result.innerHTML = '<span style="color: red">' + document.getElementById('timeoutSec').options[document.getElementById('timeoutSec').selectedIndex].value + 's超时，正确答案：' + window.answer + '</span>';
+      showNextButtons();
+    }
+  }
+}
+function setAudioEnabled() {
+  if (localStorage) localStorage.setItem("audioEnabled", document.getElementById('enableAudio').checked);
+}
+function setWrongFirstEnabled() {
+  if (localStorage) {
+    localStorage.setItem("wrongFirstEnabled", document.getElementById('enableWrongFirst').checked);
+	window.r = [];
+  }
+}
+function resetTimeout() {
+  if (localStorage) localStorage.setItem("selectedTimeoutIndex", document.getElementById('timeoutSec').selectedIndex.toString());
+
+  var next = document.getElementById('next');
+  if (next && next.style.display == 'block') return;
+
+  clearInterval(window.myTimer);
+  window.myElasped = document.getElementById('timeoutSec').options[document.getElementById('timeoutSec').selectedIndex].value;
+  showElapsed();
+  window.myElasped--;
+  window.myTimer = setInterval('showElapsed();window.myElasped--', 1000);
+}
+function getOffset(id) {
+  if (!document.getElementById('enableWrongFirst').checked || !localStorage || !localStorage.getItem("wrong_" + id)) return 0;
+  return 1;
+}
+function getRandomIndex() {
+  //no duplication random
+  if (!window.r || !window.r.length) {
+    window.r = [];
+    for (var i = 0; i < data.length; ++i) window.r[i] = i;
+    window.r.sort(function(a,b) {
+	  var offset_a = getOffset((a + 1).toString());
+	  var offset_b = getOffset((b + 1).toString());
+	  
+	  return 0.5-Math.random() + offset_a - offset_b;
+	});
+  }
+  
+  return r.pop();
+}
+function showNextQuestion(id) {
+  if (id=='divSettings') return;
+  var index = parseInt(id) > 0 ? (id-1) : getRandomIndex();
+  var previousId = (window.historyIds && window.historyIds.length) ? window.historyIds[window.historyIds.length - 1] : null;
+  if (!id) id = (index + 1).toString();
+  if (previousId != id) {
+    if (!window.historyIds) window.historyIds = [];
+    window.historyIds.push(id);
+  }
+  window.currentId = id;
+  window.firstSelect = null;
+  window.answer = data[index].a;
+  document.getElementById('content').innerHTML = data[index].id + '. ' + data[index].q.replace(/\n/g, '<br/><br/>').replace(/ \-\-/g, '<br /> --')
+    .replace(/([ABCD])(\.[^\.]+(\s+|$))/g, '<div id="$1"><label for="radio_$1"><input id="radio_$1" type="radio" name="abcd" value="$1" onclick="showResult(this.value);document.getElementById(\'next\').focus()" /> $1$2</label></div>')
+    + '<div id="result"></div>'
+    + '<div id="tips" style="display:none">解析：<br />' + data[index].t.replace(/\n/g, '<br/><br/>') + '</div>'
+    + '<input type="button" id="back" class="pure-button" style="display:none" onclick="window.historyIds.pop();window.r.push(parseInt(window.currentId)-1);showNextQuestion(window.historyIds.pop())" value="返回" /><input type="button" id="next" class="pure-button pure-button-primary" style="display:none" onclick="showNextQuestion()" value="下一题" />'
+	+ '<div id="rate">最近25题正确率: 50%</div>'
+  
+  document.location = '#' + (index + 1);
+  if (window.historyIds.length > 1) document.getElementById('back').style.display = 'block';
+  resetTimeout();
+  onresize();
+  document.getElementById('c').style.zIndex = 1000;
+}
+function checkhashchange() {
+  var id = document.location.href.substring(document.location.href.indexOf('#') + 1);
+  if (window.currentId != id) {
+    showNextQuestion(id);
+  }
+}
+function hideDialog() {
+  document.getElementById('overlay').style.visibility=document.getElementById('divSettings').style.visibility='hidden';
+}
+
+window.onerror = function(msg, url, line, col, error) {
+   // Note that col & error are new to the HTML 5 spec and may not be 
+   // supported in every browser.  It worked for me in Chrome.
+   var extra = !col ? '' : '\ncolumn: ' + col;
+   extra += !error ? '' : '\nerror: ' + error;
+
+   // You can view the information in an alert to see things working like this:
+   alert("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
+
+   // TODO: Report this error via ajax so you can keep track
+   //       of what pages have JS issues
+
+   var suppressErrorAlert = true;
+   // If you return true, then error alerts (like in older versions of 
+   // Internet Explorer) will be suppressed.
+   return suppressErrorAlert;
+};
+
+window.onresize = function() {
+  document.getElementById('content').style.fontSize = window.innerWidth > 500 ? '28px' : '20px';
+  clearCanvas();
+  var el = document.getElementById('c');
+  el.width = window.innerWidth;
+  el.height = document.getElementById('A').offsetTop - 40;
+}
+
+if (localStorage) {
+  var selectedTimeoutIndex = localStorage.getItem("selectedTimeoutIndex");
+  if (selectedTimeoutIndex && selectedTimeoutIndex < document.getElementById('timeoutSec').options.length) document.getElementById('timeoutSec').selectedIndex = selectedTimeoutIndex;
+  if (document.getElementById('timeoutSec').selectedIndex < 0) document.getElementById('timeoutSec').selectedIndex = 0;
+  var audioEnabled = localStorage.getItem("audioEnabled");
+  document.getElementById('enableAudio').checked = (audioEnabled == "true");
+  var wrongFirstEnabled = localStorage.getItem("wrongFirstEnabled");
+  document.getElementById('enableWrongFirst').checked = (wrongFirstEnabled == "true");
+}
+
+var hashPos = document.location.href.indexOf('#');
+var id = hashPos > 0 ? document.location.href.substring(hashPos + 1) : null;
+showNextQuestion(id);
+
+setInterval('checkhashchange()', 200);
+
+var el = document.getElementById('c');
+el.width = window.innerWidth;
+el.height = document.getElementById('A').offsetTop - 40;
+var ctx = el.getContext('2d');
+var isDrawing;
+
+function clearCanvas() {
+  var el = document.getElementById('c');
+  var ctx = el.getContext('2d');
+  ctx.clearRect(0, 0, el.width, el.height);
+  var w = el.width;
+  el.width = 1;
+  el.width = w;
+}
+
+el.onmousedown = function(e) {
+  isDrawing = true;
+  ctx.lineWidth = 1;
+  ctx.lineJoin = ctx.lineCap = 'round';
+  ctx.shadowBlur = 1;
+  ctx.strokeStyle = 'red';
+  ctx.shadowColor = 'red';
+  ctx.moveTo(e.clientX, e.clientY - 40);
+};
+el.onmousemove = function(e) {
+  if (isDrawing) {
+    ctx.lineTo(e.clientX, e.clientY - 40);
+    ctx.stroke();
+  }
+};
+document.body.onmouseup = el.onmouseup = function() {
+  isDrawing = false;
+};
+
+function touchHandler(event)
+{
+    var touches = event.changedTouches,
+        first = touches[0],
+        type = "";
+    switch(event.type)
+    {
+        case "touchstart": type = "mousedown"; break;
+        case "touchmove":  type = "mousemove"; break;        
+        case "touchend":   type = "mouseup";   break;
+        default:           return;
+    }
+
+    // initMouseEvent(type, canBubble, cancelable, view, clickCount, 
+    //                screenX, screenY, clientX, clientY, ctrlKey, 
+    //                altKey, shiftKey, metaKey, button, relatedTarget);
+
+    var simulatedEvent = document.createEvent("MouseEvent");
+    simulatedEvent.initMouseEvent(type, true, true, window, 1, 
+                                  first.screenX, first.screenY, 
+                                  first.clientX, first.clientY, false, 
+                                  false, false, false, 0/*left*/, null);
+
+    first.target.dispatchEvent(simulatedEvent);
+    event.preventDefault();
+}
+
+c.addEventListener("touchstart", touchHandler, false);
+c.addEventListener("touchmove", touchHandler, false);
+c.addEventListener("touchend", touchHandler, false);
+c.addEventListener("touchcancel", touchHandler, true); 
+</script>
+<audio id="audio_smart" src="smart.wav" preload></audio>
+<audio id="audio_again" src="again.wav" preload></audio>
+</body>
+</html>

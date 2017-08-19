@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>Teddy's Knowledge</title>
+ <link href="/atom.xml" rel="self"/>
+ <link href=""/>
+ <updated>2016-06-17T23:01:42+08:00</updated>
+ <id></id>
+ <author>
+   <name>Teddy Ma</name>
+   <email>shijie.ma@gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>Elasticsearch Mantanence Lessons Learned Today</title>
+   <link href="/2016/06/17/elasticsearch-lessons-learned/"/>
+   <updated>2016-06-17T00:00:00+08:00</updated>
+   <id>/2016/06/17/elasticsearch-lessons-learned</id>
+   <content type="html">&lt;p&gt;&lt;strong&gt;The elasticsearch cluster was down!&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Today I troubleshooted an Elasticsearch-cluster-down issue. We have a 3-node Elasticsearch cluster receiving hundreds of Giga of tracking data every day. And this afternoon, it was suddenly down and all our kibana dashboards failed to load any data from it.&lt;/p&gt;
+
+&lt;p&gt;From &lt;a href=&quot;https://github.com/lmenezes/elasticsearch-kopf&quot;&gt;elasticsearch-kopf&lt;/a&gt; monitor, we could see more than half of the shards are unallocated, so it sounds like at least 2 nodes were just restarted for some reason. Coz of our cluster setting is each index has one primary and one replica, until at least the primary shards are allocated, the indices are not able to be loaded. The shards are being slowly allocated automatically. If I’m patient enough and just wait for a while, it should be recover by itself in my understanding. So I try to wait. After 10 minutes, some dashboards could display, which looks good. But after 30 minutes, from kopf, I could see the HEAP of the master node keeps increasing, and eventually full. And the entire cluster becomes no responsive again. Restart the master node, but the HEAP still keeps increasing and be full and cluster down again.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Is it because the shards being reallocated too slow?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Someone in my team is working one a kibana dashboard, and since it suddenly stopped working, he reached me and asked if I could help to do something to speed up the recovery. And I’m guessing. Is it because the shards were reallocated too slow? I have a script which calls the elasticsearch API to do force shard reallocation. When I created the script, it was for fixing very few shards which could not be reallocated by elasticsearch itself. It looks like below:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;IFS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$&#39;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;
+for line in $(curl -s &#39;&lt;/span&gt;server_name/es/_cat/shards&lt;span class=&quot;s1&quot;&gt;&#39; | fgrep UNASSIGNED); do
+  INDEX=$(echo $line | (awk &#39;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;print &lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;))
+  SHARD=$(echo $line | (awk &#39;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;print &lt;span class=&quot;nv&quot;&gt;$2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;))
+
+  curl -XPOST &#39;&lt;/span&gt;server_name/es/_cluster/reroute&lt;span class=&quot;s1&quot;&gt;&#39; -d &#39;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+     &lt;span class=&quot;s2&quot;&gt;&quot;commands&quot;&lt;/span&gt;: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;allocate&quot;&lt;/span&gt;: &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;s2&quot;&gt;&quot;index&quot;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&quot;&#39;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$INDEX&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&#39;&quot;&lt;/span&gt;,
+                &lt;span class=&quot;s2&quot;&gt;&quot;shard&quot;&lt;/span&gt;: &lt;span class=&quot;s1&quot;&gt;&#39;$SHARD&#39;&lt;/span&gt;,
+                &lt;span class=&quot;s2&quot;&gt;&quot;node&quot;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&quot;ETELASTIC1&quot;&lt;/span&gt;,
+                &lt;span class=&quot;s2&quot;&gt;&quot;allow_primary&quot;&lt;/span&gt;: &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;
+          &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;
+
+  # try again since the first try might fail if the target node already has a copy of the shard
+  curl -XPOST &#39;&lt;/span&gt;server_name/es/_cluster/reroute&lt;span class=&quot;s1&quot;&gt;&#39; -d &#39;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+     &lt;span class=&quot;s2&quot;&gt;&quot;commands&quot;&lt;/span&gt;: &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;s2&quot;&gt;&quot;allocate&quot;&lt;/span&gt;: &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;s2&quot;&gt;&quot;index&quot;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&quot;&#39;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$INDEX&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&#39;&quot;&lt;/span&gt;,
+                &lt;span class=&quot;s2&quot;&gt;&quot;shard&quot;&lt;/span&gt;: &lt;span class=&quot;s1&quot;&gt;&#39;$SHARD&#39;&lt;/span&gt;,
+                &lt;span class=&quot;s2&quot;&gt;&quot;node&quot;&lt;/span&gt;: &lt;span class=&quot;s2&quot;&gt;&quot;ETELASTIC2&quot;&lt;/span&gt;,
+                &lt;span class=&quot;s2&quot;&gt;&quot;allow_primary&quot;&lt;/span&gt;: &lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt;
+          &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;
+
+  sleep 2
+
+done
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Restarted the master node and executed the script, and it keeps running. It’ll take some time coz I have 10K of unallocated shards. The reallocation becomes faster. But no luck that before it finishes, the HEAP became full again. So sounds like the guess is not correct.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;What causes the HEAP increasing then?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Checked the log of elasticsearch, and it shows there are only very few small cheap reads during the cluster down &amp;amp; recovery time. Checked the nodes breaker API and the fielddata cache is also not big. So what else might cost elasticsearch memory? If not reads, then it might be writes?&lt;/p&gt;
+
+&lt;p&gt;Luckily we have centralized logstash server for parsing all different types of tracking logs and feeding them to elasticsearch servers, so I simply stopped all of them. Restarted the master node again, wait and eventually, the elasticsearch cluster recovered without HEAP issue. Great! Here it is. So it should be because we configured our logstash jobs to always try re-connect elasticsearch servers when server connection timeout or no response, and since we have many logstash jobs trying to reconnect, it costs too much elasticsearch server-side memory in HEAP.&lt;/p&gt;
+
+&lt;p&gt;Let’s try some kibana dashboards, WAIT! Why some of the dashboards returns 404? It is impossible that people deleted them during my troubleshooting, we rarely delete dashboards. It makes me nerves. Coz it looks like reallocation of elasticsearch shards might cause data loss. WTF! If that’s true, how could we truct elasticsearch anymore?&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Always human’s fault!&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Ok, ask google. And, found the reason. Usually, it is always human’s fault. I mean, my fault, not elasticsearch’s. It is because of the &lt;a href=&quot;https://discuss.elastic.co/t/cluster-reroute-and-potential-data-loss/15573&quot;&gt;“allow_primary=true”&lt;/a&gt; option in my “force reallocation” script. Bascially, when all the shards of an index are unallocated yet, and if you do reroute with the “allow_primary=true” option, some shards might become empty, and you LOSS data! Luckily, it is some shards of the kibana metadata index were lost, so I realized this issue, if it is only some tracking index loss, it is much harder for me to be awared.&lt;/p&gt;
+
+&lt;p&gt;But I’m lucky enough, coz:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;I have daily backup of the kibana metadata index with &lt;a href=&quot;https://github.com/taskrabbit/elasticsearch-dump&quot;&gt;elasticdump&lt;/a&gt;, and no much dashboard changes everyday;&lt;/li&gt;
+  &lt;li&gt;We keeps latest 3-day raw data of all the tracking logs, so I could easily re-index them;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Restored from the kibana metadata index backup. And finally, all the dashboards are back!&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Summary&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Several lessons were learned here:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;When many elasticsearch cluster nodes are restarted, to avoid HEAP spike, better to temporarily stop all connection attempts;&lt;/li&gt;
+  &lt;li&gt;Avoid setting allow_primary=true when reroute shards via API;&lt;/li&gt;
+  &lt;li&gt;Don’t forget backup! It could save you some day!&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>RabbitMQ Exchange and Queue Design Trade-off</title>
+   <link href="/2016/02/23/rabbitmq-exchange-design-tradeoffs/"/>
+   <updated>2016-02-23T00:00:00+08:00</updated>
+   <id>/2016/02/23/rabbitmq-exchange-design-tradeoffs</id>
+   <content type="html">&lt;p&gt;In &lt;a href=&quot;/2016/02/22/understanding-rabbitmq-exchange-and-queue/&quot;&gt;previous post&lt;/a&gt;, I mentioned the &lt;a href=&quot;http://stackoverflow.com/questions/32220312/rabbitmq-amqp-best-practise-queue-topic-design-in-a-microservice-architecture&quot;&gt;discussion&lt;/a&gt; on StackOverflow regarding designing exchanges. Usually, when people ask about best practice of designing exchanges, you will get some useful suggestions, but finally you will be told that the final solution always “depends on your system needs”. Fair enough &amp;amp; safe enough answer, but not really helpful enough. So I want to extend this discussion a little bit here with more detailed backgrounds.&lt;/p&gt;
+
+&lt;p&gt;Before discussing any solutions, I’m trying to suggest some rules first. No matter which solutions to choose, these rules should be correct in most cases and should be followed if there are no compelling reasons.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Rule 1&lt;/strong&gt;&lt;br /&gt;
+Each queue should only represent one type of jobs. Do not mix different type of messages in one queue. And when this rule is followed, we could clearly name a queue with the job represented by it.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Rule 2&lt;/strong&gt;&lt;br /&gt;
+Avoid messgae re-dispatching on a queue. If you find that your subscriber is trying to re-dispatch any messages to other places without real processing, there might be something wrong. Routing or dispatching is the responsibility of exchanges rather than queues.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Rule 3&lt;/strong&gt;&lt;br /&gt;
+When not using the global default exchange, publishers should know nothing about queues. One of the essences of the AMQP design is the responsibility separation of exchange &amp;amp; queue, so that publishers don’t need to care about message comsuption, and comcumers don’t need tocare about where comes the messages at all. So when designing exchanges, the concepts only related to publishing, such as routing keys &amp;amp; message headers, should not has any knowledge of the queues they will finally been forwarded to.&lt;/p&gt;
+
+&lt;p&gt;Now let’s focus on the examples. The scenario is that you want to design exchanges and queues for “user” related write events. The write events will be triggered in one or many apps and these messages are to be consumed by some other apps.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;| object | event   |
+|------------------|
+| user   | created |
+| user   | updated |
+| user   | deleted |
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The first question people usually ask is for different events of one object (the “user” object in this example), should we use one exchange for publishing all the 3 events, or use 3 separate exchanges for each event? Or, in short, one exchange, or many?&lt;/p&gt;
+
+&lt;p&gt;Before answering this question. I actually want to ask another question: do we really even need a custom exchange for this case?&lt;/p&gt;
+
+&lt;p&gt;Different types of object events are so natual to match different types of messages to be published, but it is not really necessary sometimes. What if we abstract all the 3 types of events as a “write” event, whose sub-types are “created”, “updated” and “deleted”?&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;| object | event   | sub-type |
+|-----------------------------|
+| user   | write   | created  |
+| user   | write   | updated  |
+| user   | write   | deleted  |
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Solution 1&lt;/strong&gt;&lt;br /&gt;
+The simplest solution to support this is we could only design a “user.write” queue, and publish all user write event messages to this queue directly via the global default exchange. When publishing to a queue directly, the biggest limitation is it assumes that only one app subscribes to this type of messages. Multiple instances of one app subscribing to this queue is also fine.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;| queue      | app  |
+|-------------------|
+| user.write | app1 |
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Solution 2&lt;/strong&gt;&lt;br /&gt;
+The simplest solution could not work when there is a second app (having different processing logic) want to subscribe to any messages published to the queue. When there are multiple apps subscribing, we at least need one “fanout” type exchange with bindings to multiple queues. So that messages are published to the excahnge, and the exchange duplicates the messages to each of the queues. Each queue represents the processing job of each different app.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;| queue           | subscriber  |
+|-------------------------------|
+| user.write.app1 | app1        |
+| user.write.app2 | app2        |
+
+| exchange   | type   | binding_queue   |
+|---------------------------------------|
+| user.write | fanout | user.write.app1 |
+| user.write | fanout | user.write.app2 |
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This second solution works fine if each subscriber does care about and want to handle all the sub-types of “user.write” events or at least to expose all these sub-type events to each subscribers is not a problem. For instance, if the subscriber app is for simply keeping the transction log; or although the subscriber handles only user.created, it is ok to let it know about when user.updated or user.deleted happens. It becomes less elegant when some subscribers are from external of your organization, and you only want to notify them about some specific sub-type events. For instance, if app2 only wants to handle user.created and it should not have the knowledge of user.updated or user.deleted at all.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Solution 3&lt;/strong&gt;&lt;br /&gt;
+To solve the issue above, we have to extract “user.created” concept from “user.write”. The “topic” type of exchange could help. When publishing the messages, let’s use user.created/user.updated/user.deleted as routing keys, so that we could set the binding key of “user.write.app1” queue be “user.*” and the binding key of “user.created.app2” queue be “user.created”.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;| queue             | subscriber  |
+|---------------------------------|
+| user.write.app1   | app1        |
+| user.created.app2 | app2        |
+
+| exchange   | type  | binding_queue     | binding_key  |
+|-------------------------------------------------------|
+| user.write | topic | user.write.app1   | user.*       |
+| user.write | topic | user.created.app2 | user.created |
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Solution 4&lt;/strong&gt;&lt;br /&gt;
+The “topic” exchange type is more flexible in case potentially there will be more event sub-types. But if you clearly know the exact number of events, you could also use the “direct” exchange type instead for better performance.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;| queue             | subscriber  |
+|---------------------------------|
+| user.write.app1   | app1        |
+| user.created.app2 | app2        |
+
+| exchange   | type   | binding_queue    | binding_key   |
+|--------------------------------------------------------|
+| user.write | direct | user.write.app1   | user.created |
+| user.write | direct | user.write.app1   | user.updated |
+| user.write | direct | user.write.app1   | user.deleted |
+| user.write | direct | user.created.app2 | user.created |
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Come back to the “one exchange, or many?” question. So far, all the solutions use only one exchange. Works fine, nothing wrong. Then, when might we need multiple exchanges? &lt;a href=&quot;http://spring.io/blog/2011/04/01/routing-topologies-for-performance-and-scalability-with-rabbitmq/&quot;&gt;This link&lt;/a&gt; summarizes some valuable ideas about performance and scalability considerations. If performance difference of too many bindings on “topic exchange” really becomes an issue, of course you could use more “direct” exchanges to reduce number of “topic” exchange bindings for better performance. But, here I want to focus more on function limitations of “one exchange” solutions.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Solution 5&lt;/strong&gt;&lt;br /&gt;
+One case we might natually consider multiple exchanges is for different groups or dimensions of events. For instance, besides the created, updated and deleted events memtioned above, if we have another group of events: login and logout - a group of events describing “user behaviors” rather than “data write”. Coz different group of events might need completely different routing strategies and routing key &amp;amp; queue naming conventions, it is so that natual to have a separate user.behavior exchange.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;| queue              | subscriber  |
+|----------------------------------|
+| user.write.app1    | app1        |
+| user.created.app2  | app2        |
+| user.behavior.app3 | app3        |
+
+| exchange      | type  | binding_queue      | binding_key     |
+|--------------------------------------------------------------|
+| user.write    | topic | user.write.app1    | user.*          |
+| user.write    | topic | user.created.app2  | user.created    |
+| user.behavior | topic | user.behavior.app3 | user.*          |
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Other Solutions&lt;/strong&gt;&lt;br /&gt;
+There are other cases when we might need multiple exchanges for one object type. For instance, if you want to set different permissions on exchanges (e.g. only selected events of one object type are allowed to be published to one exchange from external apps, while the other exchange accepts any the events from internal apps). For another instance, if you want to use different exchanges suffixed with a version number to support different versions of routing strategies of same group of events. For another another instance, you might want to define some “internal exchanges” for exchange-to-exchange bindings, which could manage routing rules in a layered way.&lt;/p&gt;
+
+&lt;p&gt;In summary, still, “the final solution depends on your system needs”, but with all the solution examples above, and with the background considerations, as said in the &lt;a href=&quot;http://spring.io/blog/2011/04/01/routing-topologies-for-performance-and-scalability-with-rabbitmq/&quot;&gt;performance and scalability consideration link&lt;/a&gt;, I also hope it could at least get one thinking in the right directions.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Understanding RabbitMQ Exchange and Queue</title>
+   <link href="/2016/02/22/understanding-rabbitmq-exchange-and-queue/"/>
+   <updated>2016-02-22T00:00:00+08:00</updated>
+   <id>/2016/02/22/understanding-rabbitmq-exchange-and-queue</id>
+   <content type="html">&lt;p&gt;In &lt;a href=&quot;/2016/02/18/behind-rabbitmq-exchange-types/&quot;&gt;previous post&lt;/a&gt;, I compared the difference of ActiveMQ (JMS) and RabbitMQ (AMQP)’s design philosophy. RabbitMQ has its beauty of simplicity in its design with 5 exchange types. In this post, I want to clarify the understanding of RabbitMQ’s exchange &amp;amp; queue and their relationship - binding.&lt;/p&gt;
+
+&lt;p&gt;In brief, exchanges are the only places where messages could be published to; while queues are the only places where messages could be consumed from. And the configurations for how messages should be routed from exchanges to queues are called bindings.&lt;/p&gt;
+
+&lt;p&gt;Imagine a message as a mail, then an exchange is like a post office, and a queue is kind of a mailbox in front of someone’s house. Different exchange types are like different types of mails which will be delivered in different ways. For instances, if a school wants to send the same notification mail to every student’s mailbox (kind of broardcast), it is exchange type - “fanout”; if a mail should only be sent to one specific student’s mailbox, it is exchange type - “direct”, and the key of the binding between the exchange and the queue should be the address of the student’s mailbox which the post office could understand. The mail to be sent to the post office should have the same address written on it, this address is the “routing key” of the message.&lt;/p&gt;
+
+&lt;p&gt;In RabbitMQ, it is not possible for a publisher to send a message to a queue directly. Even when you send a message without specifying an exchange, the message is actually sent to the global default exchange, who has bindings to each queue with queue name as binding key.&lt;/p&gt;
+
+&lt;p&gt;Messages can only be consumed from queues, consuming from exchanges directly are not allowed. An exchange has no storage. So if you send a message to an exchange while there are no queues bound to it or no bindings match the routing key of the message, the message will be thrown away immediately.&lt;/p&gt;
+
+&lt;p&gt;About designing exchanges, there is &lt;a href=&quot;http://stackoverflow.com/questions/32220312/rabbitmq-amqp-best-practise-queue-topic-design-in-a-microservice-architecture&quot;&gt;an interesting discussion&lt;/a&gt; on StackOverflow for modeling a classic scenario. One exchange, or many? Which one is better? My opinion is similar to derick’s. It really depends on your system needs. RabbitMQ’s exchange types are simple, but flexible enough to support different modellings for the same scenario. There are always tradeoffs with each one. But no matter one or many exchanges you choose, I agree with Jason Lotito’s comments there about routing keys and naming convention of queues: “Routing keys are elements of the message, and the queues shouldn’t care about that (he means the naming of queues should not care about value of routing keys of published messages). That’s what bindings are for.”, “Queue names should be named after what the consumer attached to the queue will do. What is the intent of the operation of this queue.”.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Behind RabbitMQ Exchange Types</title>
+   <link href="/2016/02/18/behind-rabbitmq-exchange-types/"/>
+   <updated>2016-02-18T00:00:00+08:00</updated>
+   <id>/2016/02/18/behind-rabbitmq-exchange-types</id>
+   <content type="html">&lt;p&gt;Before touching RabbitMQ, I used MSMQ &amp;amp; ZeroMQ much in real projects before. I also played  Apache ActiveMQ together with Camel a little bit (but not in real projects) when evaluating different ESB solutions before.&lt;/p&gt;
+
+&lt;p&gt;Like everyone, my first glance of RabbitMQ is the &lt;a href=&quot;https://www.rabbitmq.com/getstarted.html&quot;&gt;Get Started&lt;/a&gt; tutorials, and the feeling of the RabbitMQ design philosophy is, it is quite like the design philosophy of ZeroMQ - simple &amp;amp; consistent interface and super flexible configuration. Among all of the configuration options, the most interesting part is the “exchange types”. You might want to say that the concept of “exchange types” is from the &lt;a href=&quot;https://www.rabbitmq.com/amqp-0-9-1-reference.html&quot;&gt;AMQP&lt;/a&gt; protocol, not invented by RabbitMQ. Yes, you are right. But no doubt that RabbitMQ is one of the most popular AMQP implementations.&lt;/p&gt;
+
+&lt;p&gt;The 6 examples in the &lt;a href=&quot;https://www.rabbitmq.com/getstarted.html&quot;&gt;Get Started&lt;/a&gt; tutorials show the flexibility of RabbitMQ with the consistent and simple Publish &amp;amp; Receive interface. And I believe you could already imagine many more usages of them to match many other common scenarios.&lt;/p&gt;
+
+&lt;p&gt;But, what’s the underlying philosophy behind “exchange types”? In a word, it is all about implementing integration patterns in a manner of simple, stupid.&lt;/p&gt;
+
+&lt;p&gt;If you ever played Apache ActiveMQ and Camel, you must be familar with the &lt;a href=&quot;http://www.enterpriseintegrationpatterns.com&quot;&gt;Enterprise Integration Patterns&lt;/a&gt;. The examples of Apache Camel even exactly match all of the integration patterns. The design philosophy of ActiveMQ is, it provides the basic queue and pub/sub ability, and, together with Camel, to give ultimate flexibility for implementing all the integration patterns.&lt;/p&gt;
+
+&lt;p&gt;The design philosophy of ZeroMQ and RabbitMQ is quite different. Ultimate flexibility is cool, but performance and simplicity are also important. ZeroMQ chooses ultimate performance and simplicity rather than more integration features, while RabbitMQ is kind of in between of ActiveMQ and ZeroMQ. Its interface is as simple as ZeroMQ; the performance is not as super as ZeroMQ, but good enough; and it provides minimal but elegant configuration options to support most of the common integration patterns. One of the essences of its design is just the “exchange types”, which abstracts most common message routing &amp;amp; consuming scenarios with only 5 easy-to-understand types: default (no routing), direct, fanout (broadcast), topic and header.&lt;/p&gt;
+
+&lt;p&gt;Modeling &amp;amp; programming is the art of abstracting complexity. A real elegant design must be simple, stupid! That’s what behind the idea of “exchange types”.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Integrate PrettyPhoto with jekyll-picture-tag plugin</title>
+   <link href="/2016/01/21/integrate-prettyphoto-with-jekyll-picture-tag/"/>
+   <updated>2016-01-21T00:00:00+08:00</updated>
+   <id>/2016/01/21/integrate-prettyphoto-with-jekyll-picture-tag</id>
+   <content type="html">&lt;p&gt;In &lt;a href=&quot;/2016/01/20/installed-jekyll-picture-tag/&quot;&gt;previous post&lt;/a&gt;, I talked about installed jekyll-picture-tag plugin to display pictures responsively in posts. It works very well in different browsers and resolutions. But sometimes, we might want a photo gallery. Instead of displaying the full size of photos, we might want to display thumbnails, and on click, popup a lightbox style slideshow window for displaying the full size of photos.&lt;/p&gt;
+
+&lt;p&gt;So, in this post, I want to talk about how I have integrated &lt;a href=&quot;http://www.no-margin-for-errors.com/projects/prettyphoto-jquery-lightbox-clone/#prettyPhoto&quot;&gt;PrettyPhoto&lt;/a&gt; with jekyll-picture-tag plugin. Our goal is no change to jekyll-picture-tag plugin, and to use the same jekyll-picture-tag’s liquid tag format, only to add PrettyPhoto effect with addtional attributes when necessary.&lt;/p&gt;
+
+&lt;p&gt;The live example, is already in the &lt;a href=&quot;/2016/01/20/installed-jekyll-picture-tag/&quot;&gt;previous post&lt;/a&gt;, an image is clicked, the PrettyPhoto slideshow window will popup.&lt;/p&gt;
+
+&lt;p&gt;The only addtional attribute we add to the jekyll-picture-tag liquid tag is “group”. You could see the sample liquid tag below. Images marked with the same group value, will be displayed together in the same PrettyPhoto slideshow window. So easy!&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;{% picture 2015-1-20-1.jpg alt=&quot;picture 1&quot; group=&quot;1&quot; %}
+{% picture 2015-1-20-2.jpg alt=&quot;picture 2&quot; group=&quot;1&quot; %}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Besides the addtional attribute in liquid tag. We also need to add necessary css and js to our page template. So, in the header include file, we need to add the following:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Pretty Photo --&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/public/js/jquery-1.6.1.min.js&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;text/javascript&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;charset=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;link&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;rel=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;stylesheet&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;href=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/public/css/prettyPhoto.css&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;text/css&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;media=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;screen&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;charset=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/public/js/jquery.prettyPhoto.js&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;text/javascript&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;charset=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;  
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;text/javascript&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;charset=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ready&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+	  &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;picture img&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;each&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(){&lt;/span&gt;
+	    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;group&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+		
+	    &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;parent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;parent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+	    &lt;span class=&quot;nx&quot;&gt;parent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;rel&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;prettyPhoto[group_&#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;group&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&#39;]&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+		&lt;span class=&quot;nx&quot;&gt;parent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;href&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;parent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;children&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;first&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;attr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;srcset&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+	  &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;picture[rel^=&#39;prettyPhoto&#39;]&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;prettyPhoto&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;theme&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39;pp_default&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;slideshow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;autoplay_slideshow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;social_tools&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;  
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Also, we need to add necessary css, js and image files to the jekyll repo. All the files could be downloaded from the official &lt;a href=&quot;http://www.no-margin-for-errors.com/projects/prettyphoto-jquery-lightbox-clone/#prettyPhoto&quot;&gt;PrettyPhoto&lt;/a&gt; site.&lt;/p&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Installed jekyll-picture-tag plugin</title>
+   <link href="/2016/01/20/installed-jekyll-picture-tag/"/>
+   <updated>2016-01-20T00:00:00+08:00</updated>
+   <id>/2016/01/20/installed-jekyll-picture-tag</id>
+   <content type="html">&lt;p&gt;Installed jekyll-picture-tag plugin to display pictures responsively in posts.&lt;/p&gt;
+
+&lt;p&gt;Steps to install:&lt;/p&gt;
+
+&lt;p&gt;Step 1: install gem;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gem install jekyll-picture-tag
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Step 2: edit _config.yml according to: &lt;a href=&quot;https://github.com/robwierzbowski/jekyll-picture-tag/blob/master/examples/_config.yml&quot;&gt;jekyll-picture-tag _config.yml example&lt;/a&gt;;&lt;/p&gt;
+
+&lt;p&gt;Step 3: add liquid tag to post;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;{% picture 2015-1-20-1.jpg alt=&quot;picture 1&quot; group=&quot;1&quot; %}
+{% picture 2015-1-20-2.jpg alt=&quot;picture 2&quot; group=&quot;1&quot; %}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;picture&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-1-720by478-6defef.jpg&quot; media=&quot;&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-1-720by478-6defef.jpg&quot; media=&quot;(min-width: 40em)&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-1-450by299-6defef.jpg&quot; media=&quot;(min-width: 30em)&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-1-250by166-6defef.jpg&quot; /&gt;
+    &lt;img src=&quot;/generated/2015-1-20-1-250by166-6defef.jpg&quot; itemprop=&quot;image&quot; alt=&quot;picture 1&quot; group=&quot;1&quot; /&gt;
+  &lt;/picture&gt;
+
+&lt;picture&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-2-720by478-ba1450.jpg&quot; media=&quot;&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-2-720by478-ba1450.jpg&quot; media=&quot;(min-width: 40em)&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-2-450by299-ba1450.jpg&quot; media=&quot;(min-width: 30em)&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-2-250by166-ba1450.jpg&quot; /&gt;
+    &lt;img src=&quot;/generated/2015-1-20-2-250by166-ba1450.jpg&quot; itemprop=&quot;image&quot; alt=&quot;picture 2&quot; group=&quot;1&quot; /&gt;
+  &lt;/picture&gt;
+
+</content>
+ </entry>
+ 
+ <entry>
+   <title>How to Change RabbitMQ Queue Parameters in Production?</title>
+   <link href="/2016/01/19/how-to-change-rabbitmq-queue-parameters-in-production/"/>
+   <updated>2016-01-19T00:00:00+08:00</updated>
+   <id>/2016/01/19/how-to-change-rabbitmq-queue-parameters-in-production</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.rabbitmq.com/&quot;&gt;RabbitMQ&lt;/a&gt; does not allow re-declaring a queue with different values of parameters such as durability, auto delete, etc. Some parameters could be configured both by queue parameter and server-side policies, but if both are set, queue parameters win. So as long as queue parameters are used, it is the same problem.&lt;/p&gt;
+
+&lt;p&gt;So, what if, in production environment, we do want to do the change?&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Firstly&lt;/strong&gt;, if your system could accept temporary downtime, then the easiest way is apparently to stop all your publisher and subscriber apps, delete the queue, and create the new one with new parameters.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Secondly&lt;/strong&gt;, if possible, instead of applying incompatible parameters on existing queue, it is always recommended to add a version number to your queue (meaning creating a new queue with the same name prefix as the old one, but to add/increase the version number as part of the queue name). So that after released the config or code and restarted all the publisher and consumer apps, you only need to move all the pending messages from the old queue (if any) to the new queue, and then delete the old queue.&lt;/p&gt;
+
+&lt;p&gt;If you really want to change some incompatible parameters of an existing queue in production environment in a safe way (no message lost and system hang), some tricky manual steps have to be executed. RabbitMQ is so flexible, you could have many different ways to reach the same goal, so here I just try to give some examples, from which, you could gain some clues to benefit your real scenarios.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Example 1&lt;/strong&gt;, if the dead letter exchange and the message TTL option of the old queue is not configured with queue parameters, meaning we could configure them with server-side policies, and also all the publisher apps only work with exchanges forwarding messages to the old queue, not publishing messages to the old queue directly:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;We could temporarily create a new queue and a new exchange bound to it, set the temporary exchange as the dead letter exchange of the old queue and set the message TTL of the old queue to 0 with server-side policies. From now on, all the new messages published to the old queue will automatically be forwarded to the new queue.&lt;/li&gt;
+  &lt;li&gt;As long as the old queue have no pending messages any more, you could change the upstream exchanges of the old queue to bind to the new queue instead.&lt;/li&gt;
+  &lt;li&gt;Now you could recreate the old queue and repeat step 1 on the new queue (dead letter exchange and TTL 0) to change back to use the recreated queue.&lt;/li&gt;
+  &lt;li&gt;Delete all temporary exchanges and queues.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;Example 2&lt;/strong&gt;, similar to example 1, the difference is we could not configure dead letter exchange or message TTL on old queue, and if our subscribers could tolerate receiving duplicated messages:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;We could create a temporary queue and bind to all the upstream exchanges of the old queue, so that duplicated messages are forwarded to both the old queue and the new queue now.&lt;/li&gt;
+  &lt;li&gt;Then we delete &amp;amp; recreate the old queue with the same bindings.&lt;/li&gt;
+  &lt;li&gt;After restarted all the apps (they are still talking to the old queue), let’s move all the pending messages in the new queue to the old queue with the shovel plugin (please realize that there might be some duplicated messages received by subscribers).&lt;/li&gt;
+  &lt;li&gt;Delete the temporary queue.&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>This is Teddy's New Blog!</title>
+   <link href="/2016/01/18/new-blog-site/"/>
+   <updated>2016-01-18T00:00:00+08:00</updated>
+   <id>/2016/01/18/new-blog-site</id>
+   <content type="html">&lt;p&gt;Welcome to Teddy’s new blog site!&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Open Source eBook - Learn Cassandra (English + Chinese Version)</title>
+   <link href="/2014/06/16/gitbook-learn-cassandra/"/>
+   <updated>2014-06-16T00:00:00+08:00</updated>
+   <id>/2014/06/16/gitbook-learn-cassandra</id>
+   <content type="html">&lt;p&gt;Read: &lt;a href=&quot;http://teddymaef.github.io/learncassandra/&quot;&gt;http://teddymaef.github.io/learncassandra/&lt;/a&gt;&lt;/p&gt;
+</content>
+ </entry>
+ 
+
+</feed>

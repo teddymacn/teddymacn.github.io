@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Integrate PrettyPhoto with jekyll-picture-tag plugin &middot; Teddy's Knowledge
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/public/favicon.ico">
+
+  <!-- Pretty Photo -->
+  <script src="/public/js/jquery-1.6.1.min.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="/public/css/prettyPhoto.css" type="text/css" media="screen" charset="utf-8" />
+  <script src="/public/js/jquery.prettyPhoto.js" type="text/javascript" charset="utf-8"></script>  
+  
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+	  $("picture img").each(function(){
+	    if (!$(this).attr('group')) return;
+		
+	    var parent = $(this).parent();
+	    parent.attr('rel', 'prettyPhoto[group_' + $(this).attr('group') + ']');
+		parent.attr('href', parent.children().first().attr('srcset'));
+	  });
+      $("picture[rel^='prettyPhoto']").prettyPhoto({theme:'pp_default',slideshow:5000,autoplay_slideshow:false,social_tools:false});
+    });
+  </script>
+</head>
+
+
+  <body class="sidebar-overlay">
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+	<p><center><img style="margin-right:10px;border-radius: 50%" src="http://en.gravatar.com/userimage/97021725/fa8250da64cab70aa5d8430e92ac3c1a?size=80" /></center></p>
+    <p>Teddy Ma, full-stack software developer/architect in internet & online education industry for 15 years @ Shanghai, China</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href="/">Home</a>
+
+    
+
+    
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+    
+      
+        
+      
+    
+
+    <a class="sidebar-nav-item" href="http://teddyma.cnblogs.com">Teddy's Chinese Blog</a>
+    <a class="sidebar-nav-item" href="/atom.xml">Subscribe</a>
+    <a class="sidebar-nav-item" href="mailto:shijie.ma@gmail.com">Email</a>
+	<a class="sidebar-nav-item" href="https://www.linkedin.com/in/teddyma">Profile</a>
+    <a class="sidebar-nav-item" href="http://twitter.com/teddyma_cn">@teddyma_cn</a>
+  </nav>
+  <div class="sidebar-item">
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+		<input type="hidden" name="cmd" value="_donations">
+		<input type="hidden" name="business" value="PUSNNK3485T6G">
+		<input type="hidden" name="lc" value="US">
+		<input type="hidden" name="item_name" value="Donate teddyma.cn">
+		<!--<input type="hidden" name="amount" value="1.99">-->
+		<input type="hidden" name="currency_code" value="USD">
+		<input type="hidden" name="button_subtype" value="services">
+		<input type="hidden" name="no_note" value="1">
+		<input type="hidden" name="no_shipping" value="1">
+		<input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynow_SM.gif:NonHosted">
+		<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+		<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+	</form>
+  </div>
+  <div class="sidebar-item">
+    <p>
+      &copy; 2016. All rights reserved.
+    </p>
+  </div>
+  <div class="sidebar-item">
+    <p>
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		  if (ga) {
+			ga('create', 'UA-72697830-1', 'auto');
+			ga('send', 'pageview');
+		  }
+		</script>
+    </p>
+  </div> 
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="/" title="Home">Teddy's Knowledge</a>
+            <small>.NET, Open Source, Cassandra, RabbitMQ, ELK, Architecture, etc</small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="post">
+  <h1 class="post-title">Integrate PrettyPhoto with jekyll-picture-tag plugin</h1>
+  <span class="post-date">21 Jan 2016&nbsp;&nbsp;&nbsp;&nbsp;
+	
+	  
+	    <a href="/tag/jekyll">jekyll</a>&nbsp;&nbsp;
+	  
+	
+  </span>
+  <p>In <a href="/2016/01/20/installed-jekyll-picture-tag/">previous post</a>, I talked about installed jekyll-picture-tag plugin to display pictures responsively in posts. It works very well in different browsers and resolutions. But sometimes, we might want a photo gallery. Instead of displaying the full size of photos, we might want to display thumbnails, and on click, popup a lightbox style slideshow window for displaying the full size of photos.</p>
+
+<p>So, in this post, I want to talk about how I have integrated <a href="http://www.no-margin-for-errors.com/projects/prettyphoto-jquery-lightbox-clone/#prettyPhoto">PrettyPhoto</a> with jekyll-picture-tag plugin. Our goal is no change to jekyll-picture-tag plugin, and to use the same jekyll-picture-tag’s liquid tag format, only to add PrettyPhoto effect with addtional attributes when necessary.</p>
+
+<p>The live example, is already in the <a href="/2016/01/20/installed-jekyll-picture-tag/">previous post</a>, an image is clicked, the PrettyPhoto slideshow window will popup.</p>
+
+<p>The only addtional attribute we add to the jekyll-picture-tag liquid tag is “group”. You could see the sample liquid tag below. Images marked with the same group value, will be displayed together in the same PrettyPhoto slideshow window. So easy!</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>{% picture 2015-1-20-1.jpg alt="picture 1" group="1" %}
+{% picture 2015-1-20-2.jpg alt="picture 2" group="1" %}
+</code></pre>
+</div>
+
+<p>Besides the addtional attribute in liquid tag. We also need to add necessary css and js to our page template. So, in the header include file, we need to add the following:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>  <span class="c">&lt;!-- Pretty Photo --&gt;</span>
+  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/js/jquery-1.6.1.min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>
+  <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"/public/css/prettyPhoto.css"</span> <span class="na">type=</span><span class="s">"text/css"</span> <span class="na">media=</span><span class="s">"screen"</span> <span class="na">charset=</span><span class="s">"utf-8"</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/js/jquery.prettyPhoto.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>  
+  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	  <span class="nx">$</span><span class="p">(</span><span class="s2">"picture img"</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+	    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'group'</span><span class="p">))</span> <span class="k">return</span><span class="p">;</span>
+		
+	    <span class="kd">var</span> <span class="nx">parent</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">parent</span><span class="p">();</span>
+	    <span class="nx">parent</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'rel'</span><span class="p">,</span> <span class="s1">'prettyPhoto[group_'</span> <span class="o">+</span> <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'group'</span><span class="p">)</span> <span class="o">+</span> <span class="s1">']'</span><span class="p">);</span>
+		<span class="nx">parent</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'href'</span><span class="p">,</span> <span class="nx">parent</span><span class="p">.</span><span class="nx">children</span><span class="p">().</span><span class="nx">first</span><span class="p">().</span><span class="nx">attr</span><span class="p">(</span><span class="s1">'srcset'</span><span class="p">));</span>
+	  <span class="p">});</span>
+      <span class="nx">$</span><span class="p">(</span><span class="s2">"picture[rel^='prettyPhoto']"</span><span class="p">).</span><span class="nx">prettyPhoto</span><span class="p">({</span><span class="na">theme</span><span class="p">:</span><span class="s1">'pp_default'</span><span class="p">,</span><span class="na">slideshow</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span><span class="na">autoplay_slideshow</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="na">social_tools</span><span class="p">:</span><span class="kc">false</span><span class="p">});</span>
+    <span class="p">});</span>
+  <span class="nt">&lt;/script&gt;</span>  
+</code></pre>
+</div>
+
+<p>Also, we need to add necessary css, js and image files to the jekyll repo. All the files could be downloaded from the official <a href="http://www.no-margin-for-errors.com/projects/prettyphoto-jquery-lightbox-clone/#prettyPhoto">PrettyPhoto</a> site.</p>
+
+
+</div>
+
+<div class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2016/06/17/elasticsearch-lessons-learned/">
+            Elasticsearch Mantanence Lessons Learned Today
+            <small>17 Jun 2016</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/23/rabbitmq-exchange-design-tradeoffs/">
+            RabbitMQ Exchange and Queue Design Trade-off
+            <small>23 Feb 2016</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2016/02/22/understanding-rabbitmq-exchange-and-queue/">
+            Understanding RabbitMQ Exchange and Queue
+            <small>22 Feb 2016</small>
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+    <br />
+	<div id="disqus_thread"></div>
+	<script>
+		(function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+			var d = document, s = d.createElement('script');
+			
+			s.src = '//teddymacn.disqus.com/embed.js';  // IMPORTANT: Replace EXAMPLE with your forum shortname!
+			
+			s.setAttribute('data-timestamp', +new Date());
+			(d.head || d.body).appendChild(s);
+		})();
+	</script>
+	<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>  
+
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script>
+      (function(document) {
+        var toggle = document.querySelector('.sidebar-toggle');
+        var sidebar = document.querySelector('#sidebar');
+        var checkbox = document.querySelector('#sidebar-checkbox');
+
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          if(!checkbox.checked ||
+             sidebar.contains(target) ||
+             (target === checkbox || target === toggle)) return;
+
+          checkbox.checked = false;
+        }, false);
+      })(document);
+    </script>
+  </body>
+</html>

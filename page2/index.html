@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Teddy's Knowledge &middot; .NET, Open Source, Cassandra, RabbitMQ, ELK, Architecture, etc
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/public/favicon.ico">
+
+  <!-- Pretty Photo -->
+  <script src="/public/js/jquery-1.6.1.min.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" href="/public/css/prettyPhoto.css" type="text/css" media="screen" charset="utf-8" />
+  <script src="/public/js/jquery.prettyPhoto.js" type="text/javascript" charset="utf-8"></script>  
+  
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function(){
+	  $("picture img").each(function(){
+	    if (!$(this).attr('group')) return;
+		
+	    var parent = $(this).parent();
+	    parent.attr('rel', 'prettyPhoto[group_' + $(this).attr('group') + ']');
+		parent.attr('href', parent.children().first().attr('srcset'));
+	  });
+      $("picture[rel^='prettyPhoto']").prettyPhoto({theme:'pp_default',slideshow:5000,autoplay_slideshow:false,social_tools:false});
+    });
+  </script>
+</head>
+
+
+  <body class="sidebar-overlay">
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+	<p><center><img style="margin-right:10px;border-radius: 50%" src="http://en.gravatar.com/userimage/97021725/fa8250da64cab70aa5d8430e92ac3c1a?size=80" /></center></p>
+    <p>Teddy Ma, full-stack software developer/architect in internet & online education industry for 15 years @ Shanghai, China</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="sidebar-nav-item" href="/">Home</a>
+
+    
+
+    
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+    
+      
+        
+      
+    
+
+    <a class="sidebar-nav-item" href="http://teddyma.cnblogs.com">Teddy's Chinese Blog</a>
+    <a class="sidebar-nav-item" href="/atom.xml">Subscribe</a>
+    <a class="sidebar-nav-item" href="mailto:shijie.ma@gmail.com">Email</a>
+	<a class="sidebar-nav-item" href="https://www.linkedin.com/in/teddyma">Profile</a>
+    <a class="sidebar-nav-item" href="http://twitter.com/teddyma_cn">@teddyma_cn</a>
+  </nav>
+  <div class="sidebar-item">
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+		<input type="hidden" name="cmd" value="_donations">
+		<input type="hidden" name="business" value="PUSNNK3485T6G">
+		<input type="hidden" name="lc" value="US">
+		<input type="hidden" name="item_name" value="Donate teddyma.cn">
+		<!--<input type="hidden" name="amount" value="1.99">-->
+		<input type="hidden" name="currency_code" value="USD">
+		<input type="hidden" name="button_subtype" value="services">
+		<input type="hidden" name="no_note" value="1">
+		<input type="hidden" name="no_shipping" value="1">
+		<input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynow_SM.gif:NonHosted">
+		<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+		<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+	</form>
+  </div>
+  <div class="sidebar-item">
+    <p>
+      &copy; 2016. All rights reserved.
+    </p>
+  </div>
+  <div class="sidebar-item">
+    <p>
+		<script>
+		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		  if (ga) {
+			ga('create', 'UA-72697830-1', 'auto');
+			ga('send', 'pageview');
+		  }
+		</script>
+    </p>
+  </div> 
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="/" title="Home">Teddy's Knowledge</a>
+            <small>.NET, Open Source, Cassandra, RabbitMQ, ELK, Architecture, etc</small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="posts">
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="/2016/01/20/installed-jekyll-picture-tag/">
+        Installed jekyll-picture-tag plugin
+      </a>
+    </h1>
+
+    <span class="post-date">20 Jan 2016&nbsp;&nbsp;&nbsp;&nbsp;
+	
+	  
+	    <a href="/tag/jekyll">jekyll</a>&nbsp;&nbsp;
+	  
+	
+	</span>
+    <p>Installed jekyll-picture-tag plugin to display pictures responsively in posts.</p>
+
+<p>Steps to install:</p>
+
+<p>Step 1: install gem;</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>gem install jekyll-picture-tag
+</code></pre>
+</div>
+
+<p>Step 2: edit _config.yml according to: <a href="https://github.com/robwierzbowski/jekyll-picture-tag/blob/master/examples/_config.yml">jekyll-picture-tag _config.yml example</a>;</p>
+
+<p>Step 3: add liquid tag to post;</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>{% picture 2015-1-20-1.jpg alt="picture 1" group="1" %}
+{% picture 2015-1-20-2.jpg alt="picture 2" group="1" %}
+</code></pre>
+</div>
+
+<picture>
+    <source srcset="/generated/2015-1-20-1-720by478-6defef.jpg" media="" />
+    <source srcset="/generated/2015-1-20-1-720by478-6defef.jpg" media="(min-width: 40em)" />
+    <source srcset="/generated/2015-1-20-1-450by299-6defef.jpg" media="(min-width: 30em)" />
+    <source srcset="/generated/2015-1-20-1-250by166-6defef.jpg" />
+    <img src="/generated/2015-1-20-1-250by166-6defef.jpg" itemprop="image" alt="picture 1" group="1" />
+  </picture>
+
+<picture>
+    <source srcset="/generated/2015-1-20-2-720by478-ba1450.jpg" media="" />
+    <source srcset="/generated/2015-1-20-2-720by478-ba1450.jpg" media="(min-width: 40em)" />
+    <source srcset="/generated/2015-1-20-2-450by299-ba1450.jpg" media="(min-width: 30em)" />
+    <source srcset="/generated/2015-1-20-2-250by166-ba1450.jpg" />
+    <img src="/generated/2015-1-20-2-250by166-ba1450.jpg" itemprop="image" alt="picture 2" group="1" />
+  </picture>
+
+
+  </div>
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="/2016/01/19/how-to-change-rabbitmq-queue-parameters-in-production/">
+        How to Change RabbitMQ Queue Parameters in Production?
+      </a>
+    </h1>
+
+    <span class="post-date">19 Jan 2016&nbsp;&nbsp;&nbsp;&nbsp;
+	
+	  
+	    <a href="/tag/rabbitmq">rabbitmq</a>&nbsp;&nbsp;
+	  
+	
+	</span>
+    <p><a href="http://www.rabbitmq.com/">RabbitMQ</a> does not allow re-declaring a queue with different values of parameters such as durability, auto delete, etc. Some parameters could be configured both by queue parameter and server-side policies, but if both are set, queue parameters win. So as long as queue parameters are used, it is the same problem.</p>
+
+<p>So, what if, in production environment, we do want to do the change?</p>
+
+<p><strong>Firstly</strong>, if your system could accept temporary downtime, then the easiest way is apparently to stop all your publisher and subscriber apps, delete the queue, and create the new one with new parameters.</p>
+
+<p><strong>Secondly</strong>, if possible, instead of applying incompatible parameters on existing queue, it is always recommended to add a version number to your queue (meaning creating a new queue with the same name prefix as the old one, but to add/increase the version number as part of the queue name). So that after released the config or code and restarted all the publisher and consumer apps, you only need to move all the pending messages from the old queue (if any) to the new queue, and then delete the old queue.</p>
+
+<p>If you really want to change some incompatible parameters of an existing queue in production environment in a safe way (no message lost and system hang), some tricky manual steps have to be executed. RabbitMQ is so flexible, you could have many different ways to reach the same goal, so here I just try to give some examples, from which, you could gain some clues to benefit your real scenarios.</p>
+
+<p><strong>Example 1</strong>, if the dead letter exchange and the message TTL option of the old queue is not configured with queue parameters, meaning we could configure them with server-side policies, and also all the publisher apps only work with exchanges forwarding messages to the old queue, not publishing messages to the old queue directly:</p>
+
+<ol>
+  <li>We could temporarily create a new queue and a new exchange bound to it, set the temporary exchange as the dead letter exchange of the old queue and set the message TTL of the old queue to 0 with server-side policies. From now on, all the new messages published to the old queue will automatically be forwarded to the new queue.</li>
+  <li>As long as the old queue have no pending messages any more, you could change the upstream exchanges of the old queue to bind to the new queue instead.</li>
+  <li>Now you could recreate the old queue and repeat step 1 on the new queue (dead letter exchange and TTL 0) to change back to use the recreated queue.</li>
+  <li>Delete all temporary exchanges and queues.</li>
+</ol>
+
+<p><strong>Example 2</strong>, similar to example 1, the difference is we could not configure dead letter exchange or message TTL on old queue, and if our subscribers could tolerate receiving duplicated messages:</p>
+
+<ol>
+  <li>We could create a temporary queue and bind to all the upstream exchanges of the old queue, so that duplicated messages are forwarded to both the old queue and the new queue now.</li>
+  <li>Then we delete &amp; recreate the old queue with the same bindings.</li>
+  <li>After restarted all the apps (they are still talking to the old queue), let’s move all the pending messages in the new queue to the old queue with the shovel plugin (please realize that there might be some duplicated messages received by subscribers).</li>
+  <li>Delete the temporary queue.</li>
+</ol>
+
+  </div>
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="/2016/01/18/new-blog-site/">
+        This is Teddy's New Blog!
+      </a>
+    </h1>
+
+    <span class="post-date">18 Jan 2016&nbsp;&nbsp;&nbsp;&nbsp;
+	
+	  
+	
+	</span>
+    <p>Welcome to Teddy’s new blog site!</p>
+
+  </div>
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="/2014/06/16/gitbook-learn-cassandra/">
+        Open Source eBook - Learn Cassandra (English + Chinese Version)
+      </a>
+    </h1>
+
+    <span class="post-date">16 Jun 2014&nbsp;&nbsp;&nbsp;&nbsp;
+	
+	  
+	
+	</span>
+    <p>Read: <a href="http://teddymaef.github.io/learncassandra/">http://teddymaef.github.io/learncassandra/</a></p>
+
+  </div>
+  
+</div>
+
+<div class="pagination">
+  
+    <span class="pagination-item older">Older</span>
+  
+  
+    
+      <a class="pagination-item newer" href="/">Newer</a>
+    
+  
+</div>
+
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script>
+      (function(document) {
+        var toggle = document.querySelector('.sidebar-toggle');
+        var sidebar = document.querySelector('#sidebar');
+        var checkbox = document.querySelector('#sidebar-checkbox');
+
+        document.addEventListener('click', function(e) {
+          var target = e.target;
+
+          if(!checkbox.checked ||
+             sidebar.contains(target) ||
+             (target === checkbox || target === toggle)) return;
+
+          checkbox.checked = false;
+        }, false);
+      })(document);
+    </script>
+  </body>
+</html>

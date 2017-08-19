@@ -1,0 +1,235 @@
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>刷题</title>
+<script type="text/javascript" src="data.js"></script>
+<link rel="stylesheet" href="pure-min.css" />
+<link rel="stylesheet" href="modal.min.css" />
+<style>
+body {
+  margin: 10px;
+}
+h1, #content, #next_correct, #next_wrong, #back {
+  font-size: 20px;
+}
+.pure-form select {
+  font-size: 12px;
+  height: 30px;
+}
+#A, #B, #C, #D, label {
+  margin-bottom: 10px;
+  cursor: hand;
+}
+#result, #tips, #next_correct, #next_wrong, #back {
+  margin-top: 20px;
+}
+#linkSettings {
+  float: right;
+  text-decoration: none;
+  color: black;
+}
+a#linkSettings:hover {
+  color: #0078e7;
+}
+.modal .copy {
+  padding: 10px;
+  padding-bottom: 15x;
+}
+.modal:target {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 250px;
+  margin-top: -100px;
+  margin-left: -125px;
+}
+#next_correct, #next_wrong, #back {
+  margin-right: 20px;
+}
+#audio_button {
+  padding: 2px 10px 5px;
+}
+</style>
+</head>
+<body>
+<form class="pure-form">
+<a id="linkSettings" href="#divSettings" onclick="document.getElementById('close').href=document.getElementById('overlay').href='#'+window.currentId;document.getElementById('overlay').style.visibility=document.getElementById('divSettings').style.visibility='visible'">设置</a>
+<h1 id="title">刷题</h1>
+<div id="content">
+</div>
+<div id="divSettings" class="modal" role="dialog" aria-labelledby="设置">
+  <div class="modal-content">
+    <div class="header">
+      <a href="#" id="close" onclick="hideDialog()">
+        <div class="box box3">
+          <svg viewbox="0 0 40 40">
+	        <path class="close-x" d="M 10,10 L 30,30 M 30,10 L 10,30" />
+          </svg>
+        </div>
+      </a>
+      <h2>设置</h2>
+    </div>
+    <div class="copy">
+	  <label for="enableWrongFirst">错题优先: <input id="enableWrongFirst" type="checkbox" checked onclick="setWrongFirstEnabled()" /></label><br />
+	  <label for="enableAutoPlayNext">自动播放下一题: <input id="enableAutoPlayNext" type="checkbox" checked onclick="setAutoPlayNext()" /></label><br />
+	  倒计时时间: <select id="timeoutSec" onchange="resetTimeout()"><option value="60">60s</option><option value="45">45s</option><option value="30">30s</option><option value="15">15s</option><option value="10">10s</option><option value="5">5s</option></select>
+    </div>
+  </div>
+  <a id="overlay" href="#" onclick="hideDialog()"><div class="overlay"></div></a>
+</div>
+<audio id="audio" onended="audioEnded()"></audio>
+</form>
+<script type="text/javascript">
+if (title) document.getElementById('title').innerHTML = document.getElementsByTagName("title")[0].innerHTML = title;
+if (window.innerWidth > 500) document.getElementById('content').style.fontSize = '28px';
+
+document.getElementById('timeoutSec').selectedIndex = 3;
+
+function saveResult(isCorrect) {
+  if (localStorage) {
+	localStorage.setItem("wrong_" + window.currentId, !isCorrect ? "1" : null);
+  }
+}
+function showElapsed() {
+  var result = document.getElementById('result');
+  if (result) {
+    if (window.myElasped > 0)
+      result.innerHTML = '剩余：' + window.myElasped + 's';
+    else {
+      clearInterval(window.myTimer);
+      result.innerHTML = document.getElementById('timeoutSec').options[document.getElementById('timeoutSec').selectedIndex].value + 's时间到';
+      document.getElementById('next_correct').style.display = 'block';
+      document.getElementById('next_wrong').style.display = 'block';
+      document.getElementById('tips').style.display = 'block';
+	  document.getElementById('audio_button').disabled = false;
+	  document.getElementById('audio_button').value = '再听一遍';
+    }
+  }
+}
+function setWrongFirstEnabled() {
+  if (localStorage) {
+    localStorage.setItem("wrongFirstEnabled", document.getElementById('enableWrongFirst').checked);
+	window.r = [];
+  }
+}
+function setAutoPlayNext() {
+  if (localStorage) {
+    localStorage.setItem("autoPlayNext", document.getElementById('enableAutoPlayNext').checked);
+	window.r = [];
+  }
+}
+function resetTimeout() {
+  var selectedTimeoutIndex = localStorage.getItem("selectedTimeoutIndex");
+  if (localStorage) localStorage.setItem("selectedTimeoutIndex", document.getElementById('timeoutSec').selectedIndex);
+
+  if (!document.getElementById('audio_button').disabled) return;
+
+  clearInterval(window.myTimer);
+  window.myElasped = document.getElementById('timeoutSec').options[document.getElementById('timeoutSec').selectedIndex].value;
+  showElapsed();
+  window.myTimer = setInterval('window.myElasped--;showElapsed();', 1000);
+}
+function getOffset(id) {
+  if (!document.getElementById('enableWrongFirst').checked || !localStorage || !localStorage.getItem("wrong_" + id)) return 0;
+  return 1;
+}
+function getRandomIndex() {
+  //no duplication random
+  if (!window.r || !window.r.length) {
+    window.r = [];
+    for (var i = 0; i < data.length; ++i) window.r[i] = i;
+    window.r.sort(function(a,b) {
+	  var offset_a = getOffset((a + 1).toString());
+	  var offset_b = getOffset((b + 1).toString());
+	  
+	  return 0.5-Math.random() + offset_a - offset_b;
+	});
+  }
+  
+  return r.pop();
+}
+function showNextQuestion(id, autoPlay) {
+  if (id=='divSettings') return;
+  var index = parseInt(id) > 0 ? (id-1) : getRandomIndex();
+  var previousId = (window.historyIds && window.historyIds.length) ? window.historyIds[window.historyIds.length - 1] : null;
+  if (!id) id = (index + 1).toString();
+  if (previousId != id) {
+    if (!window.historyIds) window.historyIds = [];
+    window.historyIds.push(id);
+  }
+  window.currentId = id;
+  window.answer = data[index].a;
+  document.getElementById('content').innerHTML = data[index].id + '. <input id="audio_button" type="button" class="pure-button pure-button-primary" value="开始答题" onclick="this.disabled = true;document.getElementById(\'audio\').play()" />'
+    + '<div id="result"></div>'
+    + '<div id="tips" style="display:none">原文：<br />' + data[index].t.replace(/\n/g, '<br/>') + '<br />答案：<br />' + data[index].a.replace(/\n/g, '<br/>') + '</div>'
+    + '<input type="button" id="back" class="pure-button" style="display:none" onclick="clearInterval(window.myTimer);window.historyIds.pop();window.r.push(parseInt(window.currentId)-1);showNextQuestion(window.historyIds.pop())" value="返回" /><input type="button" id="next_correct" class="pure-button pure-button-primary" style="display:none" onclick="saveResult(1);showNextQuestion(0,document.getElementById(\'enableAutoPlayNext\').checked)" value="^_^ 我答对了，下一题" /><input type="button" id="next_wrong" class="pure-button pure-button-primary" style="display:none" onclick="saveResult(0);showNextQuestion(0,document.getElementById(\'enableAutoPlayNext\').checked)" value=">_< 我答错了，下一题" />'
+  
+  document.getElementById('audio').src = data[index].q;
+  document.location = '#' + (index + 1);
+  if (window.historyIds.length > 1) document.getElementById('back').style.display = 'block';
+  
+  if (autoPlay) document.getElementById('audio_button').click();
+}
+window.playDi = function() {
+  document.getElementById('audio_di').play();
+};
+function audioEnded() {
+  if (document.getElementById('audio_button').value != '开始答题') {
+    document.getElementById('audio_button').disabled = false;
+    return;
+  }
+
+  playDi();
+  resetTimeout();
+}
+function checkhashchange() {
+  var id = document.location.href.substring(document.location.href.indexOf('#') + 1);
+  if (window.currentId != id) {
+    showNextQuestion(id);
+  }
+}
+function hideDialog() {
+  document.getElementById('overlay').style.visibility=document.getElementById('divSettings').style.visibility='hidden';
+}
+
+window.onerror = function(msg, url, line, col, error) {
+   // Note that col & error are new to the HTML 5 spec and may not be 
+   // supported in every browser.  It worked for me in Chrome.
+   var extra = !col ? '' : '\ncolumn: ' + col;
+   extra += !error ? '' : '\nerror: ' + error;
+
+   // You can view the information in an alert to see things working like this:
+   alert("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
+
+   // TODO: Report this error via ajax so you can keep track
+   //       of what pages have JS issues
+
+   var suppressErrorAlert = true;
+   // If you return true, then error alerts (like in older versions of 
+   // Internet Explorer) will be suppressed.
+   return suppressErrorAlert;
+};
+
+window.onresize = function() {
+  document.getElementById('content').style.fontSize = window.innerWidth > 500 ? '28px' : '20px';
+}
+
+if (localStorage) {
+  var selectedTimeoutIndex = localStorage.getItem("selectedTimeoutIndex");
+  if (selectedTimeoutIndex) document.getElementById('timeoutSec').selectedIndex = selectedTimeoutIndex;
+  var wrongFirstEnabled = localStorage.getItem("wrongFirstEnabled");
+  document.getElementById('enableWrongFirst').checked = (wrongFirstEnabled == "true");
+  var autoPlayNext = localStorage.getItem("autoPlayNext");
+  document.getElementById('enableAutoPlayNext').checked = (autoPlayNext == "true");
+}
+
+var hashPos = document.location.href.indexOf('#');
+var id = hashPos > 0 ? document.location.href.substring(hashPos + 1) : null;
+showNextQuestion(id);
+
+setInterval('checkhashchange()', 200);
+</script>
+<audio id="audio_di" src="di.wav" preload></audio>
+</body>
+</html>
