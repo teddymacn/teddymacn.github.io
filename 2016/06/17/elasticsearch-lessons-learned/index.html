@@ -82,6 +82,30 @@
         
       
     
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
 
     <a class="sidebar-nav-item" href="http://teddyma.cnblogs.com">Teddy's Chinese Blog</a>
     <a class="sidebar-nav-item" href="/atom.xml">Subscribe</a>
@@ -107,7 +131,7 @@
   </div>
   <div class="sidebar-item">
     <p>
-      &copy; 2016. All rights reserved.
+      &copy; 2017. All rights reserved.
     </p>
   </div>
   <div class="sidebar-item">
@@ -135,7 +159,7 @@
         <div class="container">
           <h3 class="masthead-title">
             <a href="/" title="Home">Teddy's Knowledge</a>
-            <small>.NET, Open Source, Cassandra, RabbitMQ, ELK, Architecture, etc</small>
+            <small>.NET, Open Source, Cassandra, RabbitMQ, ELK, Docker, etc</small>
           </h3>
         </div>
       </div>
@@ -164,7 +188,7 @@
 
 <p>Someone in my team is working one a kibana dashboard, and since it suddenly stopped working, he reached me and asked if I could help to do something to speed up the recovery. And I’m guessing. Is it because the shards were reallocated too slow? I have a script which calls the elasticsearch API to do force shard reallocation. When I created the script, it was for fixing very few shards which could not be reallocated by elasticsearch itself. It looks like below:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="nv">IFS</span><span class="o">=</span><span class="nv">$'</span><span class="se">\n</span><span class="s1">'
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="nv">IFS</span><span class="o">=</span><span class="nv">$'</span><span class="se">\n</span><span class="s1">'
 for line in $(curl -s '</span>server_name/es/_cat/shards<span class="s1">' | fgrep UNASSIGNED); do
   INDEX=$(echo $line | (awk '</span><span class="o">{</span>print <span class="nv">$1</span><span class="o">}</span><span class="s1">'))
   SHARD=$(echo $line | (awk '</span><span class="o">{</span>print <span class="nv">$2</span><span class="o">}</span><span class="s1">'))
@@ -243,6 +267,15 @@ done
     
       <li>
         <h3>
+          <a href="/2017/10/22/tpl-dataflow-the-fluent-style/">
+            FluentDataflow - Fluent Style TPL Dataflow
+            <small>22 Oct 2017</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
           <a href="/2016/02/23/rabbitmq-exchange-design-tradeoffs/">
             RabbitMQ Exchange and Queue Design Trade-off
             <small>23 Feb 2016</small>
@@ -255,15 +288,6 @@ done
           <a href="/2016/02/22/understanding-rabbitmq-exchange-and-queue/">
             Understanding RabbitMQ Exchange and Queue
             <small>22 Feb 2016</small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/02/18/behind-rabbitmq-exchange-types/">
-            Behind RabbitMQ Exchange Types
-            <small>18 Feb 2016</small>
           </a>
         </h3>
       </li>
