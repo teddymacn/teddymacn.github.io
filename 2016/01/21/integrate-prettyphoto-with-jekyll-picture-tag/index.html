@@ -106,6 +106,14 @@
         
       
     
+      
+        
+      
+    
+      
+        
+      
+    
 
     <a class="sidebar-nav-item" href="http://teddyma.cnblogs.com">Teddy's Chinese Blog</a>
     <a class="sidebar-nav-item" href="/atom.xml">Subscribe</a>
@@ -131,7 +139,7 @@
   </div>
   <div class="sidebar-item">
     <p>
-      &copy; 2017. All rights reserved.
+      &copy; 2018. All rights reserved.
     </p>
   </div>
   <div class="sidebar-item">
@@ -182,14 +190,13 @@
 
 <p>The only addtional attribute we add to the jekyll-picture-tag liquid tag is “group”. You could see the sample liquid tag below. Images marked with the same group value, will be displayed together in the same PrettyPhoto slideshow window. So easy!</p>
 
-<div class="language-html highlighter-rouge"><pre class="highlight"><code>{% picture 2015-1-20-1.jpg alt="picture 1" group="1" %}
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{% picture 2015-1-20-1.jpg alt="picture 1" group="1" %}
 {% picture 2015-1-20-2.jpg alt="picture 2" group="1" %}
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Besides the addtional attribute in liquid tag. We also need to add necessary css and js to our page template. So, in the header include file, we need to add the following:</p>
 
-<div class="language-html highlighter-rouge"><pre class="highlight"><code>  <span class="c">&lt;!-- Pretty Photo --&gt;</span>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c">&lt;!-- Pretty Photo --&gt;</span>
   <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/js/jquery-1.6.1.min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>
   <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"/public/css/prettyPhoto.css"</span> <span class="na">type=</span><span class="s">"text/css"</span> <span class="na">media=</span><span class="s">"screen"</span> <span class="na">charset=</span><span class="s">"utf-8"</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/js/jquery.prettyPhoto.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>  
@@ -205,8 +212,7 @@
       <span class="nx">$</span><span class="p">(</span><span class="s2">"picture[rel^='prettyPhoto']"</span><span class="p">).</span><span class="nx">prettyPhoto</span><span class="p">({</span><span class="na">theme</span><span class="p">:</span><span class="s1">'pp_default'</span><span class="p">,</span><span class="na">slideshow</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span><span class="na">autoplay_slideshow</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="na">social_tools</span><span class="p">:</span><span class="kc">false</span><span class="p">});</span>
     <span class="p">});</span>
   <span class="nt">&lt;/script&gt;</span>  
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Also, we need to add necessary css, js and image files to the jekyll repo. All the files could be downloaded from the official <a href="http://www.no-margin-for-errors.com/projects/prettyphoto-jquery-lightbox-clone/#prettyPhoto">PrettyPhoto</a> site.</p>
 
@@ -216,6 +222,15 @@
 <div class="related">
   <h2>Related Posts</h2>
   <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2018/08/09/machine-learning-in-action-study-notes/">
+            Teddy's Machine Learning in Action Study Notes
+            <small>09 Aug 2018</small>
+          </a>
+        </h3>
+      </li>
     
       <li>
         <h3>
@@ -231,15 +246,6 @@
           <a href="/2016/06/17/elasticsearch-lessons-learned/">
             Elasticsearch Mantanence Lessons Learned Today
             <small>17 Jun 2016</small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/02/23/rabbitmq-exchange-design-tradeoffs/">
-            RabbitMQ Exchange and Queue Design Trade-off
-            <small>23 Feb 2016</small>
           </a>
         </h3>
       </li>

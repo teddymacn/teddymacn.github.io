@@ -106,6 +106,14 @@
         
       
     
+      
+        
+      
+    
+      
+        
+      
+    
 
     <a class="sidebar-nav-item" href="http://teddyma.cnblogs.com">Teddy's Chinese Blog</a>
     <a class="sidebar-nav-item" href="/atom.xml">Subscribe</a>
@@ -131,7 +139,7 @@
   </div>
   <div class="sidebar-item">
     <p>
-      &copy; 2017. All rights reserved.
+      &copy; 2018. All rights reserved.
     </p>
   </div>
   <div class="sidebar-item">
@@ -198,7 +206,7 @@
   <li>Simple aggregation example:</li>
 </ul>
 
-<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="kt">var</span> <span class="n">splitter</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TransformBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="n">KeyValuePair</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">int</span><span class="p">&gt;&gt;(</span><span class="n">input</span> <span class="p">=&gt;</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">splitter</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TransformBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="n">KeyValuePair</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">int</span><span class="p">&gt;&gt;(</span><span class="n">input</span> <span class="p">=&gt;</span>
 <span class="p">{</span>
     <span class="kt">string</span><span class="p">[]</span> <span class="n">splitted</span> <span class="p">=</span> <span class="n">input</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="sc">'='</span><span class="p">);</span>
     <span class="k">return</span> <span class="k">new</span> <span class="n">KeyValuePair</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">int</span><span class="p">&gt;(</span><span class="n">splitted</span><span class="p">[</span><span class="m">0</span><span class="p">],</span> <span class="kt">int</span><span class="p">.</span><span class="nf">Parse</span><span class="p">(</span><span class="n">splitted</span><span class="p">[</span><span class="m">1</span><span class="p">]));</span>
@@ -212,9 +220,9 @@
     <span class="n">dict</span><span class="p">[</span><span class="n">pair</span><span class="p">.</span><span class="n">Key</span><span class="p">]</span> <span class="p">=</span> <span class="n">dict</span><span class="p">.</span><span class="nf">TryGetValue</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Key</span><span class="p">,</span> <span class="k">out</span> <span class="n">oldValue</span><span class="p">)</span> <span class="p">?</span> <span class="n">oldValue</span> <span class="p">+</span> <span class="n">pair</span><span class="p">.</span><span class="n">Value</span> <span class="p">:</span> <span class="n">pair</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
 <span class="p">});</span>
 
-<span class="c1">// the created the dataflow instance is also
-// a strong-typed standard dataflow block
-</span><span class="kt">var</span> <span class="n">dataflow</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DataflowFactory</span><span class="p">().</span><span class="nf">FromPropagator</span><span class="p">(</span><span class="n">splitter</span><span class="p">)</span>
+<span class="c1">// the created the dataflow instance is also</span>
+<span class="c1">// a strong-typed standard dataflow block</span>
+<span class="kt">var</span> <span class="n">dataflow</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DataflowFactory</span><span class="p">().</span><span class="nf">FromPropagator</span><span class="p">(</span><span class="n">splitter</span><span class="p">)</span>
     <span class="p">.</span><span class="nf">LinkToTarget</span><span class="p">(</span><span class="n">aggregater</span><span class="p">)</span>
     <span class="p">.</span><span class="nf">Create</span><span class="p">();</span>
 
@@ -225,18 +233,17 @@
 
 <span class="n">Task</span><span class="p">.</span><span class="nf">WaitAll</span><span class="p">(</span><span class="n">dataflow</span><span class="p">.</span><span class="n">Completion</span><span class="p">);</span>
 
-<span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"sum(a) = {0}"</span><span class="p">,</span> <span class="n">dict</span><span class="p">[</span><span class="s">"a"</span><span class="p">]);</span> <span class="c1">//prints sum(a) = 6
-</span></code></pre>
-</div>
+<span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"sum(a) = {0}"</span><span class="p">,</span> <span class="n">dict</span><span class="p">[</span><span class="s">"a"</span><span class="p">]);</span> <span class="c1">//prints sum(a) = 6</span>
+</code></pre></div></div>
 
 <ul>
   <li>A dataflow as part of another dataflow example</li>
 </ul>
 
-<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="kt">var</span> <span class="n">factory</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DataflowFactory</span><span class="p">();</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">factory</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DataflowFactory</span><span class="p">();</span>
 
-<span class="kt">var</span> <span class="n">aggregater</span> <span class="p">=</span> <span class="p">...</span> <span class="c1">// Build an aggregator dataflow
-</span><span class="kt">var</span> <span class="n">splitter</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TransformManyBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">&gt;(</span><span class="n">line</span> <span class="p">=&gt;</span> <span class="n">line</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="sc">' '</span><span class="p">));</span>
+<span class="kt">var</span> <span class="n">aggregater</span> <span class="p">=</span> <span class="p">...</span> <span class="c1">// Build an aggregator dataflow</span>
+<span class="kt">var</span> <span class="n">splitter</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TransformManyBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">&gt;(</span><span class="n">line</span> <span class="p">=&gt;</span> <span class="n">line</span><span class="p">.</span><span class="nf">Split</span><span class="p">(</span><span class="sc">' '</span><span class="p">));</span>
 
 <span class="kt">var</span> <span class="n">dataflow</span> <span class="p">=</span> <span class="n">factory</span><span class="p">.</span><span class="n">FromPropagator</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">&gt;(</span><span class="n">splitter</span><span class="p">)</span>
     <span class="p">.</span><span class="nf">LinkToTarget</span><span class="p">(</span><span class="n">aggregator</span><span class="p">)</span>
@@ -248,15 +255,14 @@
 
 <span class="n">Task</span><span class="p">.</span><span class="nf">WaitAll</span><span class="p">(</span><span class="n">dataflow</span><span class="p">.</span><span class="n">Completion</span><span class="p">);</span>
 
-<span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"sum(b) = {0}"</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s">"b"</span><span class="p">]);</span> <span class="c1">//prints sum(b) = 10
-</span></code></pre>
-</div>
+<span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"sum(b) = {0}"</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s">"b"</span><span class="p">]);</span> <span class="c1">//prints sum(b) = 10</span>
+</code></pre></div></div>
 
 <ul>
   <li>Broadcast example</li>
 </ul>
 
-<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="kt">var</span> <span class="n">printer1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ActionBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Printer1: {0}"</span><span class="p">,</span> <span class="n">s</span><span class="p">));</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">printer1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ActionBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Printer1: {0}"</span><span class="p">,</span> <span class="n">s</span><span class="p">));</span>
 <span class="kt">var</span> <span class="n">printer2</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ActionBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Printer2: {0}"</span><span class="p">,</span> <span class="n">s</span><span class="p">));</span>
 <span class="kt">var</span> <span class="n">printer3</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ActionBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"Printer3: {0}"</span><span class="p">,</span> <span class="n">s</span><span class="p">));</span>
 
@@ -272,22 +278,21 @@
 <span class="n">dataflow</span><span class="p">.</span><span class="nf">Complete</span><span class="p">();</span>
 
 <span class="n">Task</span><span class="p">.</span><span class="nf">WaitAll</span><span class="p">(</span><span class="n">dataflow</span><span class="p">.</span><span class="n">Completion</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <ul>
   <li>Multiple sources example</li>
 </ul>
 
-<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="c1">// by default, with native TPL, if multiple sources link to the same target,
-// if set PropagateCompletion=true,
-// as long as one of the source complets, the target complets.
-// the target will miss some of the messages from the other sources.
-</span>
-<span class="c1">// BUT, with our dataflow factory here, when set PropagateCompletion=true,
-// dataflow.Complete() internally waits for all the sources to complete,
-// so the target is guaranteed to receive all the messages from all the sources
-</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// by default, with native TPL, if multiple sources link to the same target,</span>
+<span class="c1">// if set PropagateCompletion=true,</span>
+<span class="c1">// as long as one of the source complets, the target complets.</span>
+<span class="c1">// the target will miss some of the messages from the other sources.</span>
+
+<span class="c1">// BUT, with our dataflow factory here, when set PropagateCompletion=true,</span>
+<span class="c1">// dataflow.Complete() internally waits for all the sources to complete,</span>
+<span class="c1">// so the target is guaranteed to receive all the messages from all the sources</span>
+
 <span class="kt">var</span> <span class="n">source1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
 <span class="kt">var</span> <span class="n">source2</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
 <span class="kt">var</span> <span class="n">source3</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
@@ -308,16 +313,15 @@
 <span class="n">dataflow</span><span class="p">.</span><span class="nf">Complete</span><span class="p">();</span>
 
 <span class="n">Task</span><span class="p">.</span><span class="nf">WaitAll</span><span class="p">(</span><span class="n">dataflow</span><span class="p">.</span><span class="n">Completion</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <ul>
   <li>Linking with filter example</li>
 </ul>
 
-<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="c1">// the filter only accepts even numbers,
-// so odd numbers goes to declined printer
-</span><span class="kt">var</span> <span class="n">filter</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Predicate</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;(</span><span class="n">i</span> <span class="p">=&gt;</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// the filter only accepts even numbers,</span>
+<span class="c1">// so odd numbers goes to declined printer</span>
+<span class="kt">var</span> <span class="n">filter</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Predicate</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;(</span><span class="n">i</span> <span class="p">=&gt;</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="n">i</span> <span class="p">%</span> <span class="m">2</span> <span class="p">==</span> <span class="m">0</span><span class="p">;</span>
 <span class="p">});</span>
@@ -328,10 +332,10 @@
 <span class="kt">var</span> <span class="n">dataflow</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DataflowFactory</span><span class="p">().</span><span class="nf">FromPropagator</span><span class="p">(</span><span class="n">inputBlock</span><span class="p">)</span>
     <span class="p">.</span><span class="nf">LinkToTarget</span><span class="p">(</span><span class="n">printer</span>
         <span class="p">,</span> <span class="n">filter</span>
-        <span class="c1">// when linking with filter, you have to specify a declined block
-</span>        <span class="c1">// otherwise, because there will be messages declined still in the queue,
-</span>        <span class="c1">// the current block will not be able to COMPLETE (waits on its Completion will never return)
-</span>        <span class="p">,</span> <span class="n">declinedPrinter</span><span class="p">)</span>
+        <span class="c1">// when linking with filter, you have to specify a declined block</span>
+        <span class="c1">// otherwise, because there will be messages declined still in the queue,</span>
+        <span class="c1">// the current block will not be able to COMPLETE (waits on its Completion will never return)</span>
+        <span class="p">,</span> <span class="n">declinedPrinter</span><span class="p">)</span>
     <span class="p">.</span><span class="nf">Create</span><span class="p">();</span>
 
 <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="m">10</span><span class="p">;</span> <span class="p">++</span><span class="n">i</span><span class="p">)</span>
@@ -342,13 +346,12 @@
 <span class="n">dataflow</span><span class="p">.</span><span class="nf">Complete</span><span class="p">();</span>
 
 <span class="n">Task</span><span class="p">.</span><span class="nf">WaitAll</span><span class="p">(</span><span class="n">dataflow</span><span class="p">.</span><span class="n">Completion</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 <ul>
   <li>Join example</li>
 </ul>
 
-<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="kt">var</span> <span class="n">source1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">source1</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
 <span class="kt">var</span> <span class="n">source2</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
 <span class="kt">var</span> <span class="n">printer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ActionBlock</span><span class="p">&lt;</span><span class="n">Tuple</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">&gt;&gt;(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"printer: {0},{1}"</span><span class="p">,</span> <span class="n">s</span><span class="p">.</span><span class="n">Item1</span><span class="p">,</span> <span class="n">s</span><span class="p">.</span><span class="n">Item2</span><span class="p">));</span>
 
@@ -366,14 +369,13 @@
 <span class="n">dataflow</span><span class="p">.</span><span class="nf">Complete</span><span class="p">();</span>
 
 <span class="n">Task</span><span class="p">.</span><span class="nf">WaitAll</span><span class="p">(</span><span class="n">dataflow</span><span class="p">.</span><span class="n">Completion</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <ul>
   <li>Batch example</li>
 </ul>
 
-<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="kt">var</span> <span class="n">source</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">source</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;();</span>
 <span class="kt">var</span> <span class="n">printer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ActionBlock</span><span class="p">&lt;</span><span class="n">IEnumerable</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;&gt;(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"printer: "</span> <span class="p">+</span><span class="kt">string</span><span class="p">.</span><span class="nf">Join</span><span class="p">(</span><span class="s">"|"</span><span class="p">,</span> <span class="n">s</span><span class="p">)));</span>
 
 <span class="kt">var</span> <span class="n">dataflow</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DataflowFactory</span><span class="p">().</span><span class="nf">FromSource</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
@@ -390,25 +392,24 @@
 <span class="n">dataflow</span><span class="p">.</span><span class="nf">Complete</span><span class="p">();</span>
 
 <span class="n">Task</span><span class="p">.</span><span class="nf">WaitAll</span><span class="p">(</span><span class="n">dataflow</span><span class="p">.</span><span class="n">Completion</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 <ul>
   <li>If-else branching and merging example</li>
 </ul>
 
-<div class="language-csharp highlighter-rouge"><pre class="highlight"><code><span class="kt">var</span> <span class="n">factory</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DataflowFactory</span><span class="p">();</span>
-<span class="c1">// the ifFilter only accepts even numbers,
-// so odd numbers goes to elseBlock
-</span><span class="kt">var</span> <span class="n">ifFilter</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Predicate</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;(</span><span class="n">i</span> <span class="p">=&gt;</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">var</span> <span class="n">factory</span> <span class="p">=</span> <span class="k">new</span> <span class="nf">DataflowFactory</span><span class="p">();</span>
+<span class="c1">// the ifFilter only accepts even numbers,</span>
+<span class="c1">// so odd numbers goes to elseBlock</span>
+<span class="kt">var</span> <span class="n">ifFilter</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Predicate</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;(</span><span class="n">i</span> <span class="p">=&gt;</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="n">i</span> <span class="p">%</span> <span class="m">2</span> <span class="p">==</span> <span class="m">0</span><span class="p">;</span>
 <span class="p">});</span>
 <span class="kt">var</span> <span class="n">printer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">ActionBlock</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">System</span><span class="p">.</span><span class="n">Console</span><span class="p">.</span><span class="nf">WriteLine</span><span class="p">(</span><span class="s">"printer: "</span> <span class="p">+</span> <span class="n">s</span><span class="p">.</span><span class="nf">ToString</span><span class="p">()));</span>
 <span class="kt">var</span> <span class="n">inputBlock</span> <span class="p">=</span> <span class="k">new</span> <span class="n">BufferBlock</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">&gt;();</span>
-<span class="c1">// if meet ifFilter, convert to: i -&gt; i * 10
-</span><span class="kt">var</span> <span class="n">ifBlock</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TransformBlock</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">&gt;(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span> <span class="p">*</span> <span class="m">10</span><span class="p">);</span>
-<span class="c1">// else, convert to: i -&gt; i * 100
-</span><span class="kt">var</span> <span class="n">elseBlock</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TransformBlock</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">&gt;(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span> <span class="p">*</span> <span class="m">100</span><span class="p">);</span>
+<span class="c1">// if meet ifFilter, convert to: i -&gt; i * 10</span>
+<span class="kt">var</span> <span class="n">ifBlock</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TransformBlock</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">&gt;(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span> <span class="p">*</span> <span class="m">10</span><span class="p">);</span>
+<span class="c1">// else, convert to: i -&gt; i * 100</span>
+<span class="kt">var</span> <span class="n">elseBlock</span> <span class="p">=</span> <span class="k">new</span> <span class="n">TransformBlock</span><span class="p">&lt;</span><span class="kt">int</span><span class="p">,</span> <span class="kt">int</span><span class="p">&gt;(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span> <span class="p">*</span> <span class="m">100</span><span class="p">);</span>
 
 <span class="kt">var</span> <span class="n">branchingDataflow</span> <span class="p">=</span> <span class="n">factory</span><span class="p">.</span><span class="nf">FromPropagator</span><span class="p">(</span><span class="n">inputBlock</span><span class="p">)</span>
     <span class="p">.</span><span class="nf">LinkToPropagator</span><span class="p">(</span><span class="n">ifBlock</span><span class="p">,</span> <span class="n">ifFilter</span><span class="p">,</span> <span class="n">elseBlock</span><span class="p">)</span>
@@ -418,8 +419,8 @@
     <span class="p">.</span><span class="nf">LinkToTarget</span><span class="p">(</span><span class="n">printer</span><span class="p">)</span>
     <span class="p">.</span><span class="nf">Create</span><span class="p">();</span>
 
-<span class="c1">//encapsulate branchingDataflow and mergeingDataflow
-</span><span class="kt">var</span> <span class="n">dataflow</span> <span class="p">=</span> <span class="n">factory</span><span class="p">.</span><span class="nf">EncapsulateTargetDataflow</span><span class="p">(</span><span class="n">branchingDataflow</span><span class="p">,</span> <span class="n">mergeingDataflow</span><span class="p">);</span>
+<span class="c1">//encapsulate branchingDataflow and mergeingDataflow</span>
+<span class="kt">var</span> <span class="n">dataflow</span> <span class="p">=</span> <span class="n">factory</span><span class="p">.</span><span class="nf">EncapsulateTargetDataflow</span><span class="p">(</span><span class="n">branchingDataflow</span><span class="p">,</span> <span class="n">mergeingDataflow</span><span class="p">);</span>
 
 <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="m">10</span><span class="p">;</span> <span class="p">++</span><span class="n">i</span><span class="p">)</span>
 <span class="p">{</span>
@@ -429,14 +430,22 @@
 <span class="n">dataflow</span><span class="p">.</span><span class="nf">Complete</span><span class="p">();</span>
 
 <span class="n">Task</span><span class="p">.</span><span class="nf">WaitAll</span><span class="p">(</span><span class="n">dataflow</span><span class="p">.</span><span class="n">Completion</span><span class="p">);</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 </div>
 
 <div class="related">
   <h2>Related Posts</h2>
   <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2018/08/09/machine-learning-in-action-study-notes/">
+            Teddy's Machine Learning in Action Study Notes
+            <small>09 Aug 2018</small>
+          </a>
+        </h3>
+      </li>
     
       <li>
         <h3>
@@ -452,15 +461,6 @@
           <a href="/2016/02/23/rabbitmq-exchange-design-tradeoffs/">
             RabbitMQ Exchange and Queue Design Trade-off
             <small>23 Feb 2016</small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/02/22/understanding-rabbitmq-exchange-and-queue/">
-            Understanding RabbitMQ Exchange and Queue
-            <small>22 Feb 2016</small>
           </a>
         </h3>
       </li>
