@@ -1,0 +1,698 @@
+<!doctype html>
+<html class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/asProgress.css">
+  <style type="text/css">
+    html {
+        display: table;
+        margin: auto;
+        height:100%;
+    } 
+    body {
+        display: table-cell;
+        width: 1000px;
+        padding:0;
+        text-align:center;
+        vertical-align: middle;
+    }
+    .main {
+        background-image: url("images/bg1k.png");
+        background-repeat: no-repeat; 
+        margin:0;
+        padding:0;
+        height: 632px;
+        position: relative;
+    }
+    .role_a {
+        position: absolute;
+        left: 530px;
+        top: 188px;
+        width:260px;
+        height: auto;
+    }
+    .role_b {
+        position: absolute;
+        left: 220px;
+        top: 210px;
+        width:260px;
+        height: auto;
+    }
+    .avatar_a {
+        position: absolute;
+        left: 835px;
+        top: 68px;
+        width:80px;
+        height: auto;
+    }
+    .avatar_b {
+        position: absolute;
+        left: 87px;
+        top: 68px;
+        width:80px;
+        height: auto;
+    }
+    .avatar_a2 {
+        position: absolute;
+        left: 900px;
+        top: 170px;
+        width:40px;
+        height: auto;
+    }
+    .avatar_b2 {
+        position: absolute;
+        left: 60px;
+        top: 170px;
+        width:40px;
+        height: auto;
+    }
+    .avatar_a3 {
+        position: absolute;
+        left: 900px;
+        top: 225px;
+        width:40px;
+        height: auto;
+    }
+    .avatar_b3 {
+        position: absolute;
+        left: 60px;
+        top: 225px;
+        width:40px;
+        height: auto;
+    }
+    .help {
+        position: absolute;
+        left: 850px;
+        top: 500px;
+        width:50px;
+        height: auto;
+    }
+    .progress {
+        border-color: #fff;
+        border-width: 2px;
+        border-style: solid;
+        border-radius: 28px;
+        padding:0;
+        height: 28px;
+    }
+    .progress_a {
+        position: absolute;
+        left: 550px;
+        top: 91px;
+        width: 300px;
+    }
+    #progress_a {
+        float: right;
+    }
+    .progress_b {
+        position: absolute;
+        left: 150px;
+        top: 91px;
+        width: 300px;
+    }
+    .score_a {
+        position: absolute;
+        left: 752px;
+        top: 140px;
+        width:100px;
+        height: auto;
+        text-align: right;
+    }
+    .score_b {
+        position: absolute;
+        left: 150px;
+        top: 140px;
+        width:100px;
+        height: auto;
+        text-align: left;
+    }
+    .add_score_a {
+        position: absolute;
+        left: 685px;
+        top: 140px;
+        width:100px;
+        height: auto;
+        text-align: right;
+        display: none;
+    }
+    .add_score_b {
+        position: absolute;
+        left: 212px;
+        top: 140px;
+        width:100px;
+        height: auto;
+        text-align: left;
+        display: none;
+    }
+    .shadow {
+        color:#F94E87;
+		/* pretty browsers*/
+		text-shadow:#fff 0px 0px 5px;
+		zoom:1;/*force hasLayout*/
+        font-size: 48px;
+	}
+    .btn_pre, .btn_next {
+        margin-top: 20px;
+        margin-left: 10px;
+        width: 60px;
+    }
+    .topic {
+        display:none;
+        color: #fff;
+        font-size: 60px;
+        padding-top: 20px;
+    }
+    .translation {
+        position: absolute;
+        left: 260px;
+        top: 600px;
+        width: 180px;
+        z-index: 99;
+        opacity: 0.7;
+        display: none;
+    }
+    .win {
+        position:absolute;
+        left: 765px;
+        top: 200px;
+        display:none;
+        width: 120px;
+        height: auto;
+    }
+  </style>
+</head>
+<body>
+  <!--[if lt IE 8]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+  <section class="main">
+    <div class="progress progress_a" role="progressbar" data-goal="100">
+        <div class="progress__bar" id="progress_a" style="width: 100%"></div>
+    </div>
+    <div class="progress progress_b" role="progressbar" data-goal="100">
+        <div class="progress__bar" id="progress_b" style="width: 100%"></div>
+    </div>
+    <img class="translation" src="images/trans.png" />
+    <img class="role_a" src="images/a.png" />
+    <img class="role_b" src="images/b.png" />
+    <img class="avatar_a" src="images/avatar_a.png" />
+    <img class="avatar_b" src="images/avatar_b.png" />
+    <img class="avatar_a2" src="images/avatar_a2.png" />
+    <img class="avatar_b2" src="images/avatar_b2.png" />
+    <img class="avatar_a3" src="images/avatar_a3.png" />
+    <img class="avatar_b3" src="images/avatar_b3.png" />
+    <img class="help" src="images/help.png" />
+    <div class="score_a shadow">0</div>
+    <div class="score_b shadow">0</div>
+    <div class="add_score_a shadow">+<span class="num">10</span></div>
+    <div class="add_score_b shadow">+<span class="num">10</span></div>
+    <div class="topic"><div class="content">Book a Plane Ticket</div></div>
+    <img class="win" src="images/win.png" />
+  </section>
+  <script type="text/javascript" src="js/jquery.js"></script>
+  <script type="text/javascript" src="js/jquery-asProgress.js"></script>
+  <script type="text/javascript" src="js/animationCounter.js" charset="utf-8"></script>
+
+  <script type="text/javascript">
+    function percentwidth(elem_id){
+        var elem = document.getElementById(elem_id);
+        var pa = elem.offsetParent || elem;
+        return (elem.offsetWidth/pa.offsetWidth)*100;
+    }
+    function timer_a_callback() {
+        var percent_a = percentwidth('progress_a');
+        if (percent_a < window.stopAt_a + 5) percent_a = window.stopAt_a; else percent_a = percent_a - 5;
+        $('.progress_a').asProgress('go', percent_a);
+        lightening('.avatar_a');
+
+        if (percent_a == window.stopAt_a) timer_a_burn_up();
+    }
+    function timer_a_burn_up() {
+        unset_timer_a();
+    }
+    function set_timer_a(stopAt) {
+        window.timer_a = window.setInterval(timer_a_callback, 1000);
+        if (stopAt) window.stopAt_a = stopAt;
+        else window.stopAt_a = 0;
+        playAudio("countdown.wav");
+    }
+    function unset_timer_a() {
+        if (window.timer_a) window.clearInterval(timer_a);
+        stopAudio();
+    }
+
+    function timer_b_callback() {
+        var percent_b = percentwidth('progress_b');
+        if (percent_b < window.stopAt_b + 5) percent_b = window.stopAt_b; else percent_b = percent_b - 5;
+        $('.progress_b').asProgress('go', percent_b);
+        lightening('.avatar_b');
+
+        if (percent_b == window.stopAt_b) timer_b_burn_up();
+    }
+    function timer_b_burn_up() {
+        unset_timer_b();
+    }
+    function set_timer_b(stopAt) {
+        window.timer_b = window.setInterval(timer_b_callback, 1000);
+        if (stopAt) window.stopAt_b = stopAt;
+        else window.stopAt_b = 0;
+        playAudio("countdown.wav");
+    }
+    function unset_timer_b() {
+        if (window.timer_b) window.clearInterval(timer_b);
+        stopAudio();
+    }
+    function set_avatar_a_list(a,b,c) {
+        $('.avatar_a').attr('src', 'images/avatar_' + a + '.png');
+        $('.avatar_a2').attr('src', 'images/avatar_' + b + '.png');
+        $('.avatar_a3').attr('src', 'images/avatar_' + c + '.png');
+    }
+    function set_avatar_b_list(a,b,c) {
+        $('.avatar_b').attr('src', 'images/avatar_' + a + '.png');
+        $('.avatar_b2').attr('src', 'images/avatar_' + b + '.png');
+        $('.avatar_b3').attr('src', 'images/avatar_' + c + '.png');
+    }
+
+    function lightening(q){
+        $(q).fadeOut(500).fadeIn(500, lightening);
+    }
+
+    function add_score_a(score) {
+        $('.add_score_a .num').text(score);
+        $('.add_score_a').fadeIn(1000).fadeOut(1000);
+
+        var currentScore = parseInt($('.score_a').text());
+        $('.score_a').animationCounter({
+          start: currentScore,
+          end: currentScore + score,
+          step: 1,
+          delay: 1000/score
+        });
+    }
+    function add_score_b(score) {
+        $('.add_score_b .num').text(score);
+        $('.add_score_b').fadeIn(1000).fadeOut(1000);
+
+        var currentScore = parseInt($('.score_b').text());
+        $('.score_b').animationCounter({
+          start: currentScore,
+          end: currentScore + score,
+          step: 1,
+          delay: 1000/score
+        });
+    }
+    function playAudio(name) {
+        $('#audio1').attr('src', 'audios/' + name)[0].play();
+    }
+    function stopAudio() {
+        $('#audio1').attr('src', '');
+    }
+
+    jQuery(function($) {
+      $('.progress').asProgress({
+        'namespace': 'progress'
+      });
+      $('.progress').asProgress('start');
+      
+      goto_step(0);
+    });
+
+    function pre_step() {
+        if (window.currentStep <= 0) return;
+
+        goto_step(window.currentStep - 1);
+    }
+    function next_step() {
+        if (window.currentStep >= window.finalStep) return;
+
+        goto_step(window.currentStep + 1);
+    }
+
+    window.currentStep = 0;
+    window.finalStep = 16;
+    function goto_step(step) {
+        window.currentStep = step;
+        stopAudio();
+        unset_timer_a();
+        unset_timer_b();
+        $('.topic,.help_a2,.help_b2,.win,.translation').css('display', 'none');
+        $('.help').attr('src', 'images/help.png').css('width', '50px');
+
+        if (step == 0) {
+            // set avatar
+            set_avatar_a_list('a', 'a2', 'a3');
+            set_avatar_b_list('b', 'b2', 'b3');
+
+            // set progress
+            $('.progress').asProgress('finish');
+            //set_timer_a();
+
+            // set score
+            $('.score_a').text('0');
+            $('.score_b').text('0');
+            //add_score_a(10);
+
+            // set topic
+            $('.topic').css('display', 'inline');
+
+            // set help
+
+            // set audio
+            //playAudio("test.wav");
+        }
+        else if (step == 1) {
+            // set avatar
+            set_avatar_a_list('a', 'a2', 'a3');
+            set_avatar_b_list('b', 'b2', 'b3');
+
+            // set progress
+            $('.progress').asProgress('finish');
+            set_timer_b(80);
+
+            // set score
+            $('.score_a').text('0');
+            $('.score_b').text('0');
+            //add_score_a(10);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 2) {
+            // set avatar
+            set_avatar_a_list('a', 'a2', 'a3');
+            set_avatar_b_list('b2', 'b3', 'b');
+            set_timer_a(70);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('0');
+            $('.score_b').text('0');
+            add_score_b(3);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 3) {
+            // set avatar
+            set_avatar_a_list('a2', 'a3', 'a');
+            set_avatar_b_list('b2', 'b3', 'b');
+            set_timer_b(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('0');
+            $('.score_b').text('3');
+            add_score_a(3);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 4) {
+            // set avatar
+            set_avatar_a_list('a2', 'a3', 'a');
+            set_avatar_b_list('b3', 'b', 'b2');
+            set_timer_a(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('3');
+            $('.score_b').text('3');
+            add_score_b(2);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 5) {
+            // set avatar
+            set_avatar_a_list('a3', 'a', 'a2');
+            set_avatar_b_list('b3', 'b', 'b2');
+            set_timer_b(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('3');
+            $('.score_b').text('5');
+            add_score_a(3);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 6) {
+            // set avatar
+            set_avatar_a_list('a3', 'a', 'a2');
+            set_avatar_b_list('b3', 'b', 'b2');
+            //set_timer_b(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '80');
+
+            // set score
+            $('.score_a').text('6');
+            $('.score_b').text('5');
+            //add_score_a(3);
+
+            // set help
+            $('.help').attr('src', 'images/help2.png').css('width', '100px');
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 7) {
+            // set avatar
+            set_avatar_a_list('a3', 'a', 'a2');
+            set_avatar_b_list('b3', 'b', 'b2');
+            set_timer_b(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('6');
+            $('.score_b').text('5');
+            //add_score_a(3);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 8) {
+            // set avatar
+            set_avatar_a_list('a3', 'a', 'a2');
+            set_avatar_b_list('b', 'b2', 'b3');
+            set_timer_a(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('6');
+            $('.score_b').text('5');
+            add_score_b(1);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 9) {
+            // set avatar
+            set_avatar_a_list('a', 'a2', 'a3');
+            set_avatar_b_list('b', 'b2', 'b3');
+            set_timer_b(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('6');
+            $('.score_b').text('6');
+            add_score_a(1);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 10) {
+            // set avatar
+            set_avatar_a_list('a2', 'a3', 'a');
+            set_avatar_b_list('b', 'b2', 'b3');
+            set_timer_a(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('7');
+            $('.score_b').text('6');
+            add_score_b(1);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 11) {
+            // set avatar
+            set_avatar_a_list('a2', 'a3', 'a');
+            set_avatar_b_list('b2', 'b3', 'b');
+            //set_timer_b(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '80');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('7');
+            $('.score_b').text('7');
+            //add_score_a(1);
+
+            // set help
+            $('.help').attr('src', 'images/help2.png').css('width', '100px');
+            $('.translation').css('display', 'inline');
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 12) {
+            // set avatar
+            set_avatar_a_list('a2', 'a3', 'a');
+            set_avatar_b_list('b2', 'b3', 'b');
+            set_timer_a(1);
+
+            // set progress
+            $('.progress_a').asProgress('go', '80');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('7');
+            $('.score_b').text('7');
+            //add_score_a(1);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 13) {
+            // set avatar
+            set_avatar_a_list('a3', 'a', 'a2');
+            set_avatar_b_list('b2', 'b3', 'b');
+            set_timer_b(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('7');
+            $('.score_b').text('7');
+            //add_score_a(1);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 14) {
+            // set avatar
+            set_avatar_a_list('a3', 'a', 'a2');
+            set_avatar_b_list('b3', 'b', 'b2');
+            set_timer_a(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('7');
+            $('.score_b').text('7');
+            add_score_b(1);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 15) {
+            // set avatar
+            set_avatar_a_list('a2', 'a3', 'a');
+            set_avatar_b_list('b', 'b2', 'b3');
+            set_timer_b(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('7');
+            $('.score_b').text('8');
+            add_score_a(3);
+
+            // set help
+
+            // set audio
+            //playAudio("countdown.wav");
+        }
+        else if (step == 16) {
+            // set avatar
+            set_avatar_a_list('a', 'a2', 'a3');
+            set_avatar_b_list('b2', 'b3', 'b');
+            //set_timer_a(80);
+
+            // set progress
+            $('.progress_a').asProgress('go', '100');
+            $('.progress_b').asProgress('go', '100');
+
+            // set score
+            $('.score_a').text('10');
+            $('.score_b').text('8');
+            add_score_b(1);
+
+            // set help
+            $('.win').css('display', 'inline');
+            // set audio
+            playAudio("win.mp3");
+        }
+        window.currentStep = step;
+    }   
+  </script>
+
+    <audio id="audio1"></audio>
+    <button class="btn_pre" onclick="pre_step(); return false;">&lt;</button>
+    <button class="btn_next" onclick="next_step(); return false;">&gt;</button>
+</body>
+</html>
