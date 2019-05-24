@@ -139,7 +139,7 @@
   </div>
   <div class="sidebar-item">
     <p>
-      &copy; 2018. All rights reserved.
+      &copy; 2019. All rights reserved.
     </p>
   </div>
   <div class="sidebar-item">
@@ -174,6 +174,34 @@
 
       <div class="container content">
         <div class="posts">
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="/2016/02/22/understanding-rabbitmq-exchange-and-queue/">
+        Understanding RabbitMQ Exchange and Queue
+      </a>
+    </h1>
+
+    <span class="post-date">22 Feb 2016&nbsp;&nbsp;&nbsp;&nbsp;
+	
+	  
+	    <a href="/tag/rabbitmq">rabbitmq</a>&nbsp;&nbsp;
+	  
+	
+	</span>
+    <p>In <a href="/2016/02/18/behind-rabbitmq-exchange-types/">previous post</a>, I compared the difference of ActiveMQ (JMS) and RabbitMQ (AMQP)’s design philosophy. RabbitMQ has its beauty of simplicity in its design with 5 exchange types. In this post, I want to clarify the understanding of RabbitMQ’s exchange &amp; queue and their relationship - binding.</p>
+
+<p>In brief, exchanges are the only places where messages could be published to; while queues are the only places where messages could be consumed from. And the configurations for how messages should be routed from exchanges to queues are called bindings.</p>
+
+<p>Imagine a message as a mail, then an exchange is like a post office, and a queue is kind of a mailbox in front of someone’s house. Different exchange types are like different types of mails which will be delivered in different ways. For instances, if a school wants to send the same notification mail to every student’s mailbox (kind of broardcast), it is exchange type - “fanout”; if a mail should only be sent to one specific student’s mailbox, it is exchange type - “direct”, and the key of the binding between the exchange and the queue should be the address of the student’s mailbox which the post office could understand. The mail to be sent to the post office should have the same address written on it, this address is the “routing key” of the message.</p>
+
+<p>In RabbitMQ, it is not possible for a publisher to send a message to a queue directly. Even when you send a message without specifying an exchange, the message is actually sent to the global default exchange, who has bindings to each queue with queue name as binding key.</p>
+
+<p>Messages can only be consumed from queues, consuming from exchanges directly are not allowed. An exchange has no storage. So if you send a message to an exchange while there are no queues bound to it or no bindings match the routing key of the message, the message will be thrown away immediately.</p>
+
+<p>About designing exchanges, there is <a href="http://stackoverflow.com/questions/32220312/rabbitmq-amqp-best-practise-queue-topic-design-in-a-microservice-architecture">an interesting discussion</a> on StackOverflow for modeling a classic scenario. One exchange, or many? Which one is better? My opinion is similar to derick’s. It really depends on your system needs. RabbitMQ’s exchange types are simple, but flexible enough to support different modellings for the same scenario. There are always tradeoffs with each one. But no matter one or many exchanges you choose, I agree with Jason Lotito’s comments there about routing keys and naming convention of queues: “Routing keys are elements of the message, and the queues shouldn’t care about that (he means the naming of queues should not care about value of routing keys of published messages). That’s what bindings are for.”, “Queue names should be named after what the consumer attached to the queue will do. What is the intent of the operation of this queue.”.</p>
+
+  </div>
   
   <div class="post">
     <h1 class="post-title">
@@ -227,13 +255,14 @@
 
 <p>The only addtional attribute we add to the jekyll-picture-tag liquid tag is “group”. You could see the sample liquid tag below. Images marked with the same group value, will be displayed together in the same PrettyPhoto slideshow window. So easy!</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{% picture 2015-1-20-1.jpg alt="picture 1" group="1" %}
+<div class="language-html highlighter-rouge"><pre class="highlight"><code>{% picture 2015-1-20-1.jpg alt="picture 1" group="1" %}
 {% picture 2015-1-20-2.jpg alt="picture 2" group="1" %}
-</code></pre></div></div>
+</code></pre>
+</div>
 
 <p>Besides the addtional attribute in liquid tag. We also need to add necessary css and js to our page template. So, in the header include file, we need to add the following:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c">&lt;!-- Pretty Photo --&gt;</span>
+<div class="language-html highlighter-rouge"><pre class="highlight"><code>  <span class="c">&lt;!-- Pretty Photo --&gt;</span>
   <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/js/jquery-1.6.1.min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>
   <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">href=</span><span class="s">"/public/css/prettyPhoto.css"</span> <span class="na">type=</span><span class="s">"text/css"</span> <span class="na">media=</span><span class="s">"screen"</span> <span class="na">charset=</span><span class="s">"utf-8"</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/js/jquery.prettyPhoto.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>  
@@ -249,7 +278,8 @@
       <span class="nx">$</span><span class="p">(</span><span class="s2">"picture[rel^='prettyPhoto']"</span><span class="p">).</span><span class="nx">prettyPhoto</span><span class="p">({</span><span class="na">theme</span><span class="p">:</span><span class="s1">'pp_default'</span><span class="p">,</span><span class="na">slideshow</span><span class="p">:</span><span class="mi">5000</span><span class="p">,</span><span class="na">autoplay_slideshow</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="na">social_tools</span><span class="p">:</span><span class="kc">false</span><span class="p">});</span>
     <span class="p">});</span>
   <span class="nt">&lt;/script&gt;</span>  
-</code></pre></div></div>
+</code></pre>
+</div>
 
 <p>Also, we need to add necessary css, js and image files to the jekyll repo. All the files could be downloaded from the official <a href="http://www.no-margin-for-errors.com/projects/prettyphoto-jquery-lightbox-clone/#prettyPhoto">PrettyPhoto</a> site.</p>
 
@@ -276,31 +306,33 @@
 
 <p>Step 1: install gem;</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem <span class="nb">install </span>jekyll-picture-tag
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code>gem install jekyll-picture-tag
+</code></pre>
+</div>
 
 <p>Step 2: edit _config.yml according to: <a href="https://github.com/robwierzbowski/jekyll-picture-tag/blob/master/examples/_config.yml">jekyll-picture-tag _config.yml example</a>;</p>
 
 <p>Step 3: add liquid tag to post;</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{% picture 2015-1-20-1.jpg alt="picture 1" group="1" %}
+<div class="language-html highlighter-rouge"><pre class="highlight"><code>{% picture 2015-1-20-1.jpg alt="picture 1" group="1" %}
 {% picture 2015-1-20-2.jpg alt="picture 2" group="1" %}
-</code></pre></div></div>
+</code></pre>
+</div>
 
 <picture>
-    <source srcset="http://localhost:4000" media="" />
-    <source srcset="http://localhost:4000" media="(min-width: 40em)" />
-    <source srcset="http://localhost:4000" media="(min-width: 30em)" />
-    <source srcset="http://localhost:4000" />
-    <img src="http://localhost:4000" itemprop="image" alt="picture 1" group="1" />
+    <source srcset="http://localhost:4000/generated/2015-1-20-1-720by478-6defef.jpg" media="" />
+    <source srcset="http://localhost:4000/generated/2015-1-20-1-720by478-6defef.jpg" media="(min-width: 40em)" />
+    <source srcset="http://localhost:4000/generated/2015-1-20-1-450by299-6defef.jpg" media="(min-width: 30em)" />
+    <source srcset="http://localhost:4000/generated/2015-1-20-1-250by166-6defef.jpg" />
+    <img src="http://localhost:4000/generated/2015-1-20-1-250by166-6defef.jpg" itemprop="image" alt="picture 1" group="1" />
   </picture>
 
 <picture>
-    <source srcset="http://localhost:4000" media="" />
-    <source srcset="http://localhost:4000" media="(min-width: 40em)" />
-    <source srcset="http://localhost:4000" media="(min-width: 30em)" />
-    <source srcset="http://localhost:4000" />
-    <img src="http://localhost:4000" itemprop="image" alt="picture 2" group="1" />
+    <source srcset="http://localhost:4000/generated/2015-1-20-2-720by478-ba1450.jpg" media="" />
+    <source srcset="http://localhost:4000/generated/2015-1-20-2-720by478-ba1450.jpg" media="(min-width: 40em)" />
+    <source srcset="http://localhost:4000/generated/2015-1-20-2-450by299-ba1450.jpg" media="(min-width: 30em)" />
+    <source srcset="http://localhost:4000/generated/2015-1-20-2-250by166-ba1450.jpg" />
+    <img src="http://localhost:4000/generated/2015-1-20-2-250by166-ba1450.jpg" itemprop="image" alt="picture 2" group="1" />
   </picture>
 
 
@@ -347,22 +379,6 @@
   <li>After restarted all the apps (they are still talking to the old queue), let’s move all the pending messages in the new queue to the old queue with the shovel plugin (please realize that there might be some duplicated messages received by subscribers).</li>
   <li>Delete the temporary queue.</li>
 </ol>
-
-  </div>
-  
-  <div class="post">
-    <h1 class="post-title">
-      <a href="/2016/01/18/new-blog-site/">
-        This is Teddy's New Blog!
-      </a>
-    </h1>
-
-    <span class="post-date">18 Jan 2016&nbsp;&nbsp;&nbsp;&nbsp;
-	
-	  
-	
-	</span>
-    <p>Welcome to Teddy’s new blog site!</p>
 
   </div>
   

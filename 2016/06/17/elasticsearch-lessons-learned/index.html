@@ -139,7 +139,7 @@
   </div>
   <div class="sidebar-item">
     <p>
-      &copy; 2018. All rights reserved.
+      &copy; 2019. All rights reserved.
     </p>
   </div>
   <div class="sidebar-item">
@@ -196,42 +196,43 @@
 
 <p>Someone in my team is working one a kibana dashboard, and since it suddenly stopped working, he reached me and asked if I could help to do something to speed up the recovery. And I’m guessing. Is it because the shards were reallocated too slow? I have a script which calls the elasticsearch API to do force shard reallocation. When I created the script, it was for fixing very few shards which could not be reallocated by elasticsearch itself. It looks like below:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">IFS</span><span class="o">=</span><span class="s1">$'</span><span class="se">\n</span><span class="s1">'</span>
-<span class="k">for </span>line <span class="k">in</span> <span class="k">$(</span>curl <span class="nt">-s</span> <span class="s1">'server_name/es/_cat/shards'</span> | fgrep UNASSIGNED<span class="k">)</span><span class="p">;</span> <span class="k">do
-  </span><span class="nv">INDEX</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$line</span> | <span class="o">(</span><span class="nb">awk</span> <span class="s1">'{print $1}'</span><span class="k">)</span><span class="o">)</span>
-  <span class="nv">SHARD</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span> <span class="nv">$line</span> | <span class="o">(</span><span class="nb">awk</span> <span class="s1">'{print $2}'</span><span class="k">)</span><span class="o">)</span>
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="nv">IFS</span><span class="o">=</span><span class="nv">$'</span><span class="se">\n</span><span class="s1">'
+for line in $(curl -s '</span>server_name/es/_cat/shards<span class="s1">' | fgrep UNASSIGNED); do
+  INDEX=$(echo $line | (awk '</span><span class="o">{</span>print <span class="nv">$1</span><span class="o">}</span><span class="s1">'))
+  SHARD=$(echo $line | (awk '</span><span class="o">{</span>print <span class="nv">$2</span><span class="o">}</span><span class="s1">'))
 
-  curl <span class="nt">-XPOST</span> <span class="s1">'server_name/es/_cluster/reroute'</span> <span class="nt">-d</span> <span class="s1">'{
-     "commands": [
-        {
-            "allocate": {
-                "index": "'</span><span class="nv">$INDEX</span><span class="s1">'",
-                "shard": '</span><span class="nv">$SHARD</span><span class="s1">',
-                "node": "ETELASTIC1",
-                "allow_primary": true
-          }
-        }
-    ]
-  }'</span>
+  curl -XPOST '</span>server_name/es/_cluster/reroute<span class="s1">' -d '</span><span class="o">{</span>
+     <span class="s2">"commands"</span>: <span class="o">[</span>
+        <span class="o">{</span>
+            <span class="s2">"allocate"</span>: <span class="o">{</span>
+                <span class="s2">"index"</span>: <span class="s2">"'</span><span class="nv">$INDEX</span><span class="s2">'"</span>,
+                <span class="s2">"shard"</span>: <span class="s1">'$SHARD'</span>,
+                <span class="s2">"node"</span>: <span class="s2">"ETELASTIC1"</span>,
+                <span class="s2">"allow_primary"</span>: <span class="nb">true</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">]</span>
+  <span class="o">}</span><span class="s1">'
 
-  <span class="c"># try again since the first try might fail if the target node already has a copy of the shard</span>
-  curl <span class="nt">-XPOST</span> <span class="s1">'server_name/es/_cluster/reroute'</span> <span class="nt">-d</span> <span class="s1">'{
-     "commands": [
-        {
-            "allocate": {
-                "index": "'</span><span class="nv">$INDEX</span><span class="s1">'",
-                "shard": '</span><span class="nv">$SHARD</span><span class="s1">',
-                "node": "ETELASTIC2",
-                "allow_primary": true
-          }
-        }
-    ]
-  }'</span>
+  # try again since the first try might fail if the target node already has a copy of the shard
+  curl -XPOST '</span>server_name/es/_cluster/reroute<span class="s1">' -d '</span><span class="o">{</span>
+     <span class="s2">"commands"</span>: <span class="o">[</span>
+        <span class="o">{</span>
+            <span class="s2">"allocate"</span>: <span class="o">{</span>
+                <span class="s2">"index"</span>: <span class="s2">"'</span><span class="nv">$INDEX</span><span class="s2">'"</span>,
+                <span class="s2">"shard"</span>: <span class="s1">'$SHARD'</span>,
+                <span class="s2">"node"</span>: <span class="s2">"ETELASTIC2"</span>,
+                <span class="s2">"allow_primary"</span>: <span class="nb">true</span>
+          <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">]</span>
+  <span class="o">}</span><span class="s1">'
 
-  <span class="nb">sleep </span>2
+  sleep 2
 
-<span class="k">done</span>
-</code></pre></div></div>
+done
+</span></code></pre>
+</div>
 
 <p>Restarted the master node and executed the script, and it keeps running. It’ll take some time coz I have 10K of unallocated shards. The reallocation becomes faster. But no luck that before it finishes, the HEAP became full again. So sounds like the guess is not correct.</p>
 
@@ -274,6 +275,15 @@
     
       <li>
         <h3>
+          <a href="/2019/05/24/tensorflow2-in-action-part-1/">
+            Tensorflow 2.0 in Action Part 1 - Linear Regression on Small Datasets
+            <small>24 May 2019</small>
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
           <a href="/2018/08/09/machine-learning-in-action-study-notes/">
             Teddy's Machine Learning in Action Study Notes
             <small>09 Aug 2018</small>
@@ -286,15 +296,6 @@
           <a href="/2017/10/22/tpl-dataflow-the-fluent-style/">
             FluentDataflow - Fluent Style TPL Dataflow
             <small>22 Oct 2017</small>
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2016/02/23/rabbitmq-exchange-design-tradeoffs/">
-            RabbitMQ Exchange and Queue Design Trade-off
-            <small>23 Feb 2016</small>
           </a>
         </h3>
       </li>
