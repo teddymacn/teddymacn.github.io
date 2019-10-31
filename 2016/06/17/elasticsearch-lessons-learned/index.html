@@ -196,43 +196,42 @@
 
 <p>Someone in my team is working one a kibana dashboard, and since it suddenly stopped working, he reached me and asked if I could help to do something to speed up the recovery. And I’m guessing. Is it because the shards were reallocated too slow? I have a script which calls the elasticsearch API to do force shard reallocation. When I created the script, it was for fixing very few shards which could not be reallocated by elasticsearch itself. It looks like below:</p>
 
-<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="nv">IFS</span><span class="o">=</span><span class="nv">$'</span><span class="se">\n</span><span class="s1">'
-for line in $(curl -s '</span>server_name/es/_cat/shards<span class="s1">' | fgrep UNASSIGNED); do
-  INDEX=$(echo $line | (awk '</span><span class="o">{</span>print <span class="nv">$1</span><span class="o">}</span><span class="s1">'))
-  SHARD=$(echo $line | (awk '</span><span class="o">{</span>print <span class="nv">$2</span><span class="o">}</span><span class="s1">'))
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">IFS</span><span class="o">=</span><span class="s1">$'</span><span class="se">\n</span><span class="s1">'</span>
+<span class="k">for </span>line <span class="k">in</span> <span class="si">$(</span>curl <span class="nt">-s</span> <span class="s1">'server_name/es/_cat/shards'</span> | fgrep UNASSIGNED<span class="si">)</span><span class="p">;</span> <span class="k">do
+  </span><span class="nv">INDEX</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="nv">$line</span> | <span class="o">(</span><span class="nb">awk</span> <span class="s1">'{print $1}'</span><span class="o">)</span><span class="si">)</span>
+  <span class="nv">SHARD</span><span class="o">=</span><span class="si">$(</span><span class="nb">echo</span> <span class="nv">$line</span> | <span class="o">(</span><span class="nb">awk</span> <span class="s1">'{print $2}'</span><span class="o">)</span><span class="si">)</span>
 
-  curl -XPOST '</span>server_name/es/_cluster/reroute<span class="s1">' -d '</span><span class="o">{</span>
-     <span class="s2">"commands"</span>: <span class="o">[</span>
-        <span class="o">{</span>
-            <span class="s2">"allocate"</span>: <span class="o">{</span>
-                <span class="s2">"index"</span>: <span class="s2">"'</span><span class="nv">$INDEX</span><span class="s2">'"</span>,
-                <span class="s2">"shard"</span>: <span class="s1">'$SHARD'</span>,
-                <span class="s2">"node"</span>: <span class="s2">"ETELASTIC1"</span>,
-                <span class="s2">"allow_primary"</span>: <span class="nb">true</span>
-          <span class="o">}</span>
-        <span class="o">}</span>
-    <span class="o">]</span>
-  <span class="o">}</span><span class="s1">'
+  curl <span class="nt">-XPOST</span> <span class="s1">'server_name/es/_cluster/reroute'</span> <span class="nt">-d</span> <span class="s1">'{
+     "commands": [
+        {
+            "allocate": {
+                "index": "'</span><span class="nv">$INDEX</span><span class="s1">'",
+                "shard": '</span><span class="nv">$SHARD</span><span class="s1">',
+                "node": "ETELASTIC1",
+                "allow_primary": true
+          }
+        }
+    ]
+  }'</span>
 
-  # try again since the first try might fail if the target node already has a copy of the shard
-  curl -XPOST '</span>server_name/es/_cluster/reroute<span class="s1">' -d '</span><span class="o">{</span>
-     <span class="s2">"commands"</span>: <span class="o">[</span>
-        <span class="o">{</span>
-            <span class="s2">"allocate"</span>: <span class="o">{</span>
-                <span class="s2">"index"</span>: <span class="s2">"'</span><span class="nv">$INDEX</span><span class="s2">'"</span>,
-                <span class="s2">"shard"</span>: <span class="s1">'$SHARD'</span>,
-                <span class="s2">"node"</span>: <span class="s2">"ETELASTIC2"</span>,
-                <span class="s2">"allow_primary"</span>: <span class="nb">true</span>
-          <span class="o">}</span>
-        <span class="o">}</span>
-    <span class="o">]</span>
-  <span class="o">}</span><span class="s1">'
+  <span class="c"># try again since the first try might fail if the target node already has a copy of the shard</span>
+  curl <span class="nt">-XPOST</span> <span class="s1">'server_name/es/_cluster/reroute'</span> <span class="nt">-d</span> <span class="s1">'{
+     "commands": [
+        {
+            "allocate": {
+                "index": "'</span><span class="nv">$INDEX</span><span class="s1">'",
+                "shard": '</span><span class="nv">$SHARD</span><span class="s1">',
+                "node": "ETELASTIC2",
+                "allow_primary": true
+          }
+        }
+    ]
+  }'</span>
 
-  sleep 2
+  <span class="nb">sleep </span>2
 
-done
-</span></code></pre>
-</div>
+<span class="k">done</span>
+</code></pre></div></div>
 
 <p>Restarted the master node and executed the script, and it keeps running. It’ll take some time coz I have 10K of unallocated shards. The reallocation becomes faster. But no luck that before it finishes, the HEAP became full again. So sounds like the guess is not correct.</p>
 
@@ -339,5 +338,7 @@ done
         }, false);
       })(document);
     </script>
+    <div style="text-align: center; font-size: 14px;"><a href="http://beian.miit.gov.cn/">沪ICP备19038610号</a></div>
+    <br />    
   </body>
 </html>
