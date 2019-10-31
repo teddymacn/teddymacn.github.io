@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>Teddy's Knowledge</title>
- <link href="http://localhost:4000/atom.xml" rel="self"/>
- <link href="http://localhost:4000"/>
- <updated>2019-10-31T21:22:20+08:00</updated>
- <id>http://localhost:4000</id>
+ <link href="/atom.xml" rel="self"/>
+ <link href=""/>
+ <updated>2019-10-31T21:31:28+08:00</updated>
+ <id></id>
  <author>
    <name>Teddy Ma</name>
    <email>shijie.ma@gmail.com</email>
@@ -14,9 +14,9 @@
  
  <entry>
    <title>Tensorflow 2.0 in Action Part 1 - Linear Regression on Small Datasets</title>
-   <link href="http://localhost:4000/2019/05/24/tensorflow2-in-action-part-1/"/>
+   <link href="/2019/05/24/tensorflow2-in-action-part-1/"/>
    <updated>2019-05-24T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2019/05/24/tensorflow2-in-action-part-1</id>
+   <id>/2019/05/24/tensorflow2-in-action-part-1</id>
    <content type="html">&lt;p&gt;In this series of posts, I want to share my machine learning study practices of neural networks and deep learning with Tensorflow 2.0. I’d like to solve several common machine learning problems with both classical statistics-based algorithms and neural networks. And let’s see if we could intuitively make some judgments on the pros and cons of each side.&lt;/p&gt;
 
 &lt;h2 id=&quot;problem-1-predict-auto-insurance-in-sweden-linear-regression-on-small-datasets&quot;&gt;Problem 1: Predict Auto Insurance in Sweden (Linear Regression on Small Datasets)&lt;/h2&gt;
@@ -218,9 +218,9 @@
  
  <entry>
    <title>Teddy's Machine Learning in Action Study Notes</title>
-   <link href="http://localhost:4000/2018/08/09/machine-learning-in-action-study-notes/"/>
+   <link href="/2018/08/09/machine-learning-in-action-study-notes/"/>
    <updated>2018-08-09T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2018/08/09/machine-learning-in-action-study-notes</id>
+   <id>/2018/08/09/machine-learning-in-action-study-notes</id>
    <content type="html">&lt;p&gt;In recent 3 months, I have spent most of my casual time in studying machine learning algorithms. I’m really a new comer to machine learning. And left college for more than 15 years, no surprise, I have successfully forgotten most of my maths knowledge for such as calculus, linear algebra, probabilities, statistics, etc.&lt;/p&gt;
 
 &lt;p&gt;How I began my learning was from reviewing all the maths by reading books, doing exercises, then watching online machine learning videos, and finally following books &amp;amp; tutorials in action.&lt;/p&gt;
@@ -238,9 +238,9 @@
  
  <entry>
    <title>FluentDataflow - Fluent Style TPL Dataflow</title>
-   <link href="http://localhost:4000/2017/10/22/tpl-dataflow-the-fluent-style/"/>
+   <link href="/2017/10/22/tpl-dataflow-the-fluent-style/"/>
    <updated>2017-10-22T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2017/10/22/tpl-dataflow-the-fluent-style</id>
+   <id>/2017/10/22/tpl-dataflow-the-fluent-style</id>
    <content type="html">&lt;p&gt;&lt;strong&gt;Background&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;In modern application development, there are so many scenarios of dataflow processing, such large volume data processing, image/video conversion, data migration, etc.&lt;/p&gt;
@@ -495,9 +495,9 @@
  
  <entry>
    <title>Elasticsearch Mantanence Lessons Learned Today</title>
-   <link href="http://localhost:4000/2016/06/17/elasticsearch-lessons-learned/"/>
+   <link href="/2016/06/17/elasticsearch-lessons-learned/"/>
    <updated>2016-06-17T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2016/06/17/elasticsearch-lessons-learned</id>
+   <id>/2016/06/17/elasticsearch-lessons-learned</id>
    <content type="html">&lt;p&gt;&lt;strong&gt;The elasticsearch cluster was down!&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;Today I troubleshooted an Elasticsearch-cluster-down issue. We have a 3-node Elasticsearch cluster receiving hundreds of Giga of tracking data every day. And this afternoon, it was suddenly down and all our kibana dashboards failed to load any data from it.&lt;/p&gt;
@@ -582,9 +582,9 @@
  
  <entry>
    <title>RabbitMQ Exchange and Queue Design Trade-off</title>
-   <link href="http://localhost:4000/2016/02/23/rabbitmq-exchange-design-tradeoffs/"/>
+   <link href="/2016/02/23/rabbitmq-exchange-design-tradeoffs/"/>
    <updated>2016-02-23T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2016/02/23/rabbitmq-exchange-design-tradeoffs</id>
+   <id>/2016/02/23/rabbitmq-exchange-design-tradeoffs</id>
    <content type="html">&lt;p&gt;In &lt;a href=&quot;/2016/02/22/understanding-rabbitmq-exchange-and-queue/&quot;&gt;previous post&lt;/a&gt;, I mentioned the &lt;a href=&quot;http://stackoverflow.com/questions/32220312/rabbitmq-amqp-best-practise-queue-topic-design-in-a-microservice-architecture&quot;&gt;discussion&lt;/a&gt; on StackOverflow regarding designing exchanges. Usually, when people ask about best practice of designing exchanges, you will get some useful suggestions, but finally you will be told that the final solution always “depends on your system needs”. Fair enough &amp;amp; safe enough answer, but not really helpful enough. So I want to extend this discussion a little bit here with more detailed backgrounds.&lt;/p&gt;
 
 &lt;p&gt;Before discussing any solutions, I’m trying to suggest some rules first. No matter which solutions to choose, these rules should be correct in most cases and should be followed if there are no compelling reasons.&lt;/p&gt;
@@ -701,9 +701,9 @@ There are other cases when we might need multiple exchanges for one object type.
  
  <entry>
    <title>Understanding RabbitMQ Exchange and Queue</title>
-   <link href="http://localhost:4000/2016/02/22/understanding-rabbitmq-exchange-and-queue/"/>
+   <link href="/2016/02/22/understanding-rabbitmq-exchange-and-queue/"/>
    <updated>2016-02-22T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2016/02/22/understanding-rabbitmq-exchange-and-queue</id>
+   <id>/2016/02/22/understanding-rabbitmq-exchange-and-queue</id>
    <content type="html">&lt;p&gt;In &lt;a href=&quot;/2016/02/18/behind-rabbitmq-exchange-types/&quot;&gt;previous post&lt;/a&gt;, I compared the difference of ActiveMQ (JMS) and RabbitMQ (AMQP)’s design philosophy. RabbitMQ has its beauty of simplicity in its design with 5 exchange types. In this post, I want to clarify the understanding of RabbitMQ’s exchange &amp;amp; queue and their relationship - binding.&lt;/p&gt;
 
 &lt;p&gt;In brief, exchanges are the only places where messages could be published to; while queues are the only places where messages could be consumed from. And the configurations for how messages should be routed from exchanges to queues are called bindings.&lt;/p&gt;
@@ -720,9 +720,9 @@ There are other cases when we might need multiple exchanges for one object type.
  
  <entry>
    <title>Behind RabbitMQ Exchange Types</title>
-   <link href="http://localhost:4000/2016/02/18/behind-rabbitmq-exchange-types/"/>
+   <link href="/2016/02/18/behind-rabbitmq-exchange-types/"/>
    <updated>2016-02-18T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2016/02/18/behind-rabbitmq-exchange-types</id>
+   <id>/2016/02/18/behind-rabbitmq-exchange-types</id>
    <content type="html">&lt;p&gt;Before touching RabbitMQ, I used MSMQ &amp;amp; ZeroMQ much in real projects before. I also played  Apache ActiveMQ together with Camel a little bit (but not in real projects) when evaluating different ESB solutions before.&lt;/p&gt;
 
 &lt;p&gt;Like everyone, my first glance of RabbitMQ is the &lt;a href=&quot;https://www.rabbitmq.com/getstarted.html&quot;&gt;Get Started&lt;/a&gt; tutorials, and the feeling of the RabbitMQ design philosophy is, it is quite like the design philosophy of ZeroMQ - simple &amp;amp; consistent interface and super flexible configuration. Among all of the configuration options, the most interesting part is the “exchange types”. You might want to say that the concept of “exchange types” is from the &lt;a href=&quot;https://www.rabbitmq.com/amqp-0-9-1-reference.html&quot;&gt;AMQP&lt;/a&gt; protocol, not invented by RabbitMQ. Yes, you are right. But no doubt that RabbitMQ is one of the most popular AMQP implementations.&lt;/p&gt;
@@ -741,9 +741,9 @@ There are other cases when we might need multiple exchanges for one object type.
  
  <entry>
    <title>Integrate PrettyPhoto with jekyll-picture-tag plugin</title>
-   <link href="http://localhost:4000/2016/01/21/integrate-prettyphoto-with-jekyll-picture-tag/"/>
+   <link href="/2016/01/21/integrate-prettyphoto-with-jekyll-picture-tag/"/>
    <updated>2016-01-21T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2016/01/21/integrate-prettyphoto-with-jekyll-picture-tag</id>
+   <id>/2016/01/21/integrate-prettyphoto-with-jekyll-picture-tag</id>
    <content type="html">&lt;p&gt;In &lt;a href=&quot;/2016/01/20/installed-jekyll-picture-tag/&quot;&gt;previous post&lt;/a&gt;, I talked about installed jekyll-picture-tag plugin to display pictures responsively in posts. It works very well in different browsers and resolutions. But sometimes, we might want a photo gallery. Instead of displaying the full size of photos, we might want to display thumbnails, and on click, popup a lightbox style slideshow window for displaying the full size of photos.&lt;/p&gt;
 
 &lt;p&gt;So, in this post, I want to talk about how I have integrated &lt;a href=&quot;http://www.no-margin-for-errors.com/projects/prettyphoto-jquery-lightbox-clone/#prettyPhoto&quot;&gt;PrettyPhoto&lt;/a&gt; with jekyll-picture-tag plugin. Our goal is no change to jekyll-picture-tag plugin, and to use the same jekyll-picture-tag’s liquid tag format, only to add PrettyPhoto effect with addtional attributes when necessary.&lt;/p&gt;
@@ -783,9 +783,9 @@ There are other cases when we might need multiple exchanges for one object type.
  
  <entry>
    <title>Installed jekyll-picture-tag plugin</title>
-   <link href="http://localhost:4000/2016/01/20/installed-jekyll-picture-tag/"/>
+   <link href="/2016/01/20/installed-jekyll-picture-tag/"/>
    <updated>2016-01-20T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2016/01/20/installed-jekyll-picture-tag</id>
+   <id>/2016/01/20/installed-jekyll-picture-tag</id>
    <content type="html">&lt;p&gt;Installed jekyll-picture-tag plugin to display pictures responsively in posts.&lt;/p&gt;
 
 &lt;p&gt;Steps to install:&lt;/p&gt;
@@ -804,19 +804,19 @@ There are other cases when we might need multiple exchanges for one object type.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;picture&gt;
-    &lt;source srcset=&quot;http://localhost:4000/generated/2015-1-20-1-720by478-6defef.jpg&quot; media=&quot;&quot; /&gt;
-    &lt;source srcset=&quot;http://localhost:4000/generated/2015-1-20-1-720by478-6defef.jpg&quot; media=&quot;(min-width: 40em)&quot; /&gt;
-    &lt;source srcset=&quot;http://localhost:4000/generated/2015-1-20-1-450by299-6defef.jpg&quot; media=&quot;(min-width: 30em)&quot; /&gt;
-    &lt;source srcset=&quot;http://localhost:4000/generated/2015-1-20-1-250by166-6defef.jpg&quot; /&gt;
-    &lt;img src=&quot;http://localhost:4000/generated/2015-1-20-1-250by166-6defef.jpg&quot; itemprop=&quot;image&quot; alt=&quot;picture 1&quot; group=&quot;1&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-1-720by478-6defef.jpg&quot; media=&quot;&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-1-720by478-6defef.jpg&quot; media=&quot;(min-width: 40em)&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-1-450by299-6defef.jpg&quot; media=&quot;(min-width: 30em)&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-1-250by166-6defef.jpg&quot; /&gt;
+    &lt;img src=&quot;/generated/2015-1-20-1-250by166-6defef.jpg&quot; itemprop=&quot;image&quot; alt=&quot;picture 1&quot; group=&quot;1&quot; /&gt;
   &lt;/picture&gt;
 
 &lt;picture&gt;
-    &lt;source srcset=&quot;http://localhost:4000/generated/2015-1-20-2-720by478-ba1450.jpg&quot; media=&quot;&quot; /&gt;
-    &lt;source srcset=&quot;http://localhost:4000/generated/2015-1-20-2-720by478-ba1450.jpg&quot; media=&quot;(min-width: 40em)&quot; /&gt;
-    &lt;source srcset=&quot;http://localhost:4000/generated/2015-1-20-2-450by299-ba1450.jpg&quot; media=&quot;(min-width: 30em)&quot; /&gt;
-    &lt;source srcset=&quot;http://localhost:4000/generated/2015-1-20-2-250by166-ba1450.jpg&quot; /&gt;
-    &lt;img src=&quot;http://localhost:4000/generated/2015-1-20-2-250by166-ba1450.jpg&quot; itemprop=&quot;image&quot; alt=&quot;picture 2&quot; group=&quot;1&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-2-720by478-ba1450.jpg&quot; media=&quot;&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-2-720by478-ba1450.jpg&quot; media=&quot;(min-width: 40em)&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-2-450by299-ba1450.jpg&quot; media=&quot;(min-width: 30em)&quot; /&gt;
+    &lt;source srcset=&quot;/generated/2015-1-20-2-250by166-ba1450.jpg&quot; /&gt;
+    &lt;img src=&quot;/generated/2015-1-20-2-250by166-ba1450.jpg&quot; itemprop=&quot;image&quot; alt=&quot;picture 2&quot; group=&quot;1&quot; /&gt;
   &lt;/picture&gt;
 
 </content>
@@ -824,9 +824,9 @@ There are other cases when we might need multiple exchanges for one object type.
  
  <entry>
    <title>How to Change RabbitMQ Queue Parameters in Production?</title>
-   <link href="http://localhost:4000/2016/01/19/how-to-change-rabbitmq-queue-parameters-in-production/"/>
+   <link href="/2016/01/19/how-to-change-rabbitmq-queue-parameters-in-production/"/>
    <updated>2016-01-19T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2016/01/19/how-to-change-rabbitmq-queue-parameters-in-production</id>
+   <id>/2016/01/19/how-to-change-rabbitmq-queue-parameters-in-production</id>
    <content type="html">&lt;p&gt;&lt;a href=&quot;http://www.rabbitmq.com/&quot;&gt;RabbitMQ&lt;/a&gt; does not allow re-declaring a queue with different values of parameters such as durability, auto delete, etc. Some parameters could be configured both by queue parameter and server-side policies, but if both are set, queue parameters win. So as long as queue parameters are used, it is the same problem.&lt;/p&gt;
 
 &lt;p&gt;So, what if, in production environment, we do want to do the change?&lt;/p&gt;
@@ -859,18 +859,18 @@ There are other cases when we might need multiple exchanges for one object type.
  
  <entry>
    <title>This is Teddy's New Blog!</title>
-   <link href="http://localhost:4000/2016/01/18/new-blog-site/"/>
+   <link href="/2016/01/18/new-blog-site/"/>
    <updated>2016-01-18T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2016/01/18/new-blog-site</id>
+   <id>/2016/01/18/new-blog-site</id>
    <content type="html">&lt;p&gt;Welcome to Teddy’s new blog site!&lt;/p&gt;
 </content>
  </entry>
  
  <entry>
    <title>Open Source eBook - Learn Cassandra (English + Chinese Version)</title>
-   <link href="http://localhost:4000/2014/06/16/gitbook-learn-cassandra/"/>
+   <link href="/2014/06/16/gitbook-learn-cassandra/"/>
    <updated>2014-06-16T00:00:00+08:00</updated>
-   <id>http://localhost:4000/2014/06/16/gitbook-learn-cassandra</id>
+   <id>/2014/06/16/gitbook-learn-cassandra</id>
    <content type="html">&lt;p&gt;Read: &lt;a href=&quot;http://teddymaef.github.io/learncassandra/&quot;&gt;http://teddymaef.github.io/learncassandra/&lt;/a&gt;&lt;/p&gt;
 </content>
  </entry>
